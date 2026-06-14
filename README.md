@@ -24,6 +24,7 @@ RunSeal follows the Codex-style model:
 3. [RFC-0003: RunSeal policy schema](rfcs/0003-runseal-policy-schema.md)
 4. [RFC-0004: Audit event model](rfcs/0004-audit-event-model.md)
 5. [RFC-0005: Workspace/user simplification model](rfcs/0005-workspace-user-simplification-model.md)
+6. [RFC-0006: Stable execution protocol](rfcs/0006-stable-execution-protocol.md)
 
 ## CLI vocabulary
 

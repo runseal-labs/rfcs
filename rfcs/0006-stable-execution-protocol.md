@@ -1,0 +1,394 @@
+# RFC-0006: Stable execution protocol
+
+- Status: Draft
+- Created: 2026-06-14
+- Project: RunSeal
+
+## Summary
+
+RunSeal exposes a stable protocol for policy-governed local execution. The protocol is intentionally higher-level than raw process spawning: clients request an `Execution`, RunSeal prepares a `Seal`, applies policy, streams events, routes network access through controlled proxy when configured, and returns structured results.
+
+The initial transport should be JSON-RPC 2.0 over stdio or a local Unix socket / named pipe. HTTP can be added later without changing method semantics.
+
+## Goals
+
+- Give agent frameworks a small, stable API surface.
+- Keep platform backend details out of client integrations.
+- Make streaming stdout/stderr, policy denials, network proxy events, and final results first-class.
+- Support one-shot CLI use and long-lived daemon/session use.
+- Make the protocol easy to implement from Node, Python, Rust, Go, and shell wrappers.
+
+## Non-goals
+
+- No remote multi-tenant cloud control plane in v1.
+- No generic workflow scheduler.
+- No attempt to expose every OS-specific sandbox knob through the protocol.
+- No raw credential delivery to clients or sandboxed executions.
+
+## Transport
+
+### JSON-RPC 2.0
+
+Baseline transport:
+
+```text
+client <-> runseal daemon/helper
+JSON-RPC 2.0 messages over stdio, Unix socket, named pipe, or localhost HTTP bridge
+```
+
+JSON-RPC gives simple request/response semantics and notifications for event streams. The protocol should not depend on a specific transport.
+
+### Message conventions
+
+- Method names use lower camel case: `execute`, `cancelExecution`.
+- Object fields use snake_case for JSON payloads: `execution_id`, `policy_id`.
+- IDs are opaque strings with stable prefixes: `exec_`, `sess_`, `seal_`, `pol_`.
+- Timestamps are RFC 3339 UTC strings.
+- Byte fields are integers, not human-readable strings.
+
+## Core objects
+
+### ExecutionRequest
+
+```json
+{
+  "command": ["pnpm", "test"],
+  "cwd": "/workspace",
+  "policy": "workspace-proxy",
+  "env": {
+    "CI": "1"
+  },
+  "stdin": {
+    "mode": "empty"
+  },
+  "timeout_ms": 600000,
+  "metadata": {
+    "agent_id": "agent_123",
+    "skill_id": "skill_test_runner"
+  }
+}
+```
+
+Fields:
+
+- `command`: argv array. Shell strings are allowed only through explicit shell mode in a future extension.
+- `cwd`: requested working directory, resolved against policy.
+- `policy`: named policy ID or inline policy object.
+- `env`: requested non-secret environment additions. Policy may scrub or deny entries.
+- `stdin`: stdin mode: `empty`, `inherit`, `bytes`, or `stream`.
+- `timeout_ms`: optional request-level timeout.
+- `metadata`: client-provided opaque metadata copied into audit events after size limits.
+
+### Execution
+
+```json
+{
+  "execution_id": "exec_01J...",
+  "session_id": "sess_01J...",
+  "seal_id": "seal_01J...",
+  "policy_id": "workspace-proxy",
+  "policy_hash": "sha256:...",
+  "status": "running"
+}
+```
+
+Statuses:
+
+- `queued`
+- `preparing`
+- `running`
+- `canceling`
+- `finished`
+- `failed`
+- `denied`
+
+### ExecutionResult
+
+```json
+{
+  "execution_id": "exec_01J...",
+  "status": "finished",
+  "exit_code": 0,
+  "signal": null,
+  "started_at": "2026-06-14T00:00:00Z",
+  "finished_at": "2026-06-14T00:00:03Z",
+  "stdout_bytes": 1024,
+  "stderr_bytes": 128,
+  "output_truncated": false,
+  "resource_usage": {
+    "duration_ms": 3000,
+    "max_rss_bytes": 268435456,
+    "cpu_ms": 1420
+  },
+  "audit_path": ".runseal/audit/sess_01J.jsonl"
+}
+```
+
+### PolicyRef
+
+A request may pass a named policy:
+
+```json
+"workspace-proxy"
+```
+
+Or an inline policy:
+
+```json
+{
+  "version": "runseal.policy/v1",
+  "filesystem": {},
+  "network": {},
+  "audit": {}
+}
+```
+
+Inline policies must still resolve to an effective `policy_id` and `policy_hash` for audit.
+
+## Methods
+
+### `getVersion`
+
+Returns implementation and protocol versions.
+
+Request:
+
+```json
+{ "jsonrpc": "2.0", "id": 1, "method": "getVersion", "params": {} }
+```
+
+Response:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "runseal_version": "0.1.0",
+    "protocol_version": "runseal.protocol/v1",
+    "policy_versions": ["runseal.policy/v1"]
+  }
+}
+```
+
+### `getCapabilities`
+
+Returns backend and feature capabilities for the current host.
+
+```json
+{
+  "backend": "linux-bubblewrap",
+  "platform": "linux",
+  "features": {
+    "filesystem_policy": true,
+    "network_proxy": true,
+    "direct_network_deny": true,
+    "resource_limits": true,
+    "audit_jsonl": true,
+    "otel_export": false
+  }
+}
+```
+
+### `explainPolicy`
+
+Resolves and validates a policy without running a command.
+
+```json
+{
+  "method": "explainPolicy",
+  "params": {
+    "policy": "workspace-proxy",
+    "cwd": "/workspace"
+  }
+}
+```
+
+Result includes effective filesystem roots, network mode, denied defaults, backend requirements, warnings, and the policy hash.
+
+### `execute`
+
+Starts an execution.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 10,
+  "method": "execute",
+  "params": {
+    "command": ["python", "skill.py"],
+    "cwd": "/workspace",
+    "policy": "workspace-proxy"
+  }
+}
+```
+
+Response returns an `Execution` object. Output and audit events are streamed as notifications.
+
+### `cancelExecution`
+
+Requests cancellation. RunSeal should terminate the process tree and clean up the seal.
+
+```json
+{
+  "method": "cancelExecution",
+  "params": {
+    "execution_id": "exec_01J...",
+    "reason": "user_requested"
+  }
+}
+```
+
+### `getExecution`
+
+Returns current execution status and summary.
+
+```json
+{
+  "method": "getExecution",
+  "params": {
+    "execution_id": "exec_01J..."
+  }
+}
+```
+
+### `subscribeEvents`
+
+Subscribes to events for a session or execution. In stdio mode, clients may receive events automatically after `execute`; explicit subscription is useful for daemon transports.
+
+```json
+{
+  "method": "subscribeEvents",
+  "params": {
+    "execution_id": "exec_01J...",
+    "types": ["execution.*", "policy.*", "execution.network.*"]
+  }
+}
+```
+
+### `disposeSession`
+
+Releases session-scoped resources such as proxy listeners, temporary directories, and audit handles.
+
+```json
+{
+  "method": "disposeSession",
+  "params": {
+    "session_id": "sess_01J..."
+  }
+}
+```
+
+## Event notifications
+
+Events use JSON-RPC notifications. They do not have an `id`.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "event",
+  "params": {
+    "type": "execution.stdout",
+    "time": "2026-06-14T00:00:01Z",
+    "execution_id": "exec_01J...",
+    "data": "base64:SGVsbG8K",
+    "encoding": "base64",
+    "stream_offset": 0
+  }
+}
+```
+
+Important event types:
+
+- `execution.started`
+- `execution.stdout`
+- `execution.stderr`
+- `execution.finished`
+- `execution.failed`
+- `policy.denied`
+- `policy.requires_approval`
+- `sandbox.prepared`
+- `execution.network.request`
+- `execution.network.denied`
+- `execution.resource.limit_exceeded`
+
+Event schemas should align with RFC-0004.
+
+## Error model
+
+JSON-RPC errors use stable RunSeal codes in `error.data.code`.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 10,
+  "error": {
+    "code": -32010,
+    "message": "Policy denied execution",
+    "data": {
+      "code": "POLICY_DENIED",
+      "reason": "write_outside_workspace",
+      "policy_id": "workspace-write"
+    }
+  }
+}
+```
+
+Initial stable error codes:
+
+| Code | Meaning |
+|---|---|
+| `INVALID_REQUEST` | Request payload is malformed or unsupported. |
+| `POLICY_INVALID` | Policy failed validation. |
+| `POLICY_DENIED` | Policy denied the request. |
+| `APPROVAL_REQUIRED` | The request needs approval not available in this protocol call. |
+| `BACKEND_UNAVAILABLE` | No suitable backend exists on this host. |
+| `BACKEND_CAPABILITY_MISSING` | Required backend capability is unavailable. |
+| `EXECUTION_NOT_FOUND` | Execution ID is unknown. |
+| `EXECUTION_FAILED_TO_START` | Backend prepared but command could not start. |
+| `EXECUTION_TIMEOUT` | Execution exceeded timeout. |
+| `OUTPUT_LIMIT_EXCEEDED` | Output exceeded configured limits. |
+| `PROXY_ROUTE_DENIED` | Network proxy denied a route. |
+| `INTERNAL_ERROR` | Unexpected implementation failure. |
+
+## CLI mapping
+
+The CLI is a thin protocol client:
+
+```bash
+runseal exec --policy workspace-proxy -- python skill.py
+```
+
+Maps to:
+
+```json
+{
+  "method": "execute",
+  "params": {
+    "command": ["python", "skill.py"],
+    "policy": "workspace-proxy"
+  }
+}
+```
+
+CLI output modes:
+
+- default: passthrough stdout/stderr with concise final status
+- `--json`: emit final `ExecutionResult`
+- `--events`: emit JSONL event stream
+- `--explain`: call `explainPolicy` before execution
+
+## Compatibility rules
+
+- New optional fields may be added to objects.
+- Existing field meanings must not change within `runseal.protocol/v1`.
+- Clients must ignore unknown fields.
+- Servers must reject unknown required feature flags.
+- Error `data.code` values are stable within v1.
+
+## Open questions
+
+- Should approval be included in v1 as an interactive protocol, or left to host applications?
+- Should stdout/stderr stream chunks be base64-only, or allow UTF-8 text chunks when valid?
+- Should sessions be explicit (`createSession`) in v1, or implicit per execution until daemon use cases demand it?
+- Should MCP be a first-class transport profile or a separate adapter over this protocol?
