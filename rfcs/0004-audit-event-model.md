@@ -1,0 +1,153 @@
+# RFC-0004: Audit event model
+
+- Status: Draft
+- Created: 2026-06-14
+- Project: RunSeal
+
+## Summary
+
+RunSeal emits structured audit events for executions, policy decisions, sandbox backend setup, network proxy activity, resource usage, and denials. Auditability is a core product feature, not an afterthought.
+
+## Goals
+
+- Make every execution explainable after the fact.
+- Correlate command activity, policy, network requests, and resource usage.
+- Keep secrets out of logs by default.
+- Support JSONL locally and OpenTelemetry-compatible export paths.
+- Let enterprises feed events into SIEM and observability stacks.
+
+## Event envelope
+
+```json
+{
+  "type": "execution.started",
+  "time": "2026-06-14T00:00:00Z",
+  "runseal_version": "0.1.0",
+  "execution_id": "exec_123",
+  "session_id": "sess_123",
+  "policy_id": "workspace-proxy",
+  "policy_hash": "sha256:...",
+  "actor": {
+    "type": "agent",
+    "id": "agent_123"
+  },
+  "workspace": "/workspace",
+  "backend": "linux-bubblewrap"
+}
+```
+
+## Event families
+
+### Execution lifecycle
+
+- `execution.requested`
+- `execution.started`
+- `execution.stdout`
+- `execution.stderr`
+- `execution.finished`
+- `execution.failed`
+- `execution.killed`
+
+### Policy decisions
+
+- `policy.resolved`
+- `policy.allowed`
+- `policy.denied`
+- `policy.requires_approval`
+- `policy.violation`
+
+### Sandbox backend
+
+- `sandbox.prepared`
+- `sandbox.backend_capability`
+- `sandbox.backend_warning`
+- `sandbox.cleanup`
+
+### Network proxy
+
+- `execution.network.request`
+- `execution.network.denied`
+- `execution.network.auth_injected`
+- `execution.network.redacted`
+- `execution.network.error`
+
+### Resources
+
+- `execution.resource.sample`
+- `execution.resource.limit_exceeded`
+- `execution.output.truncated`
+
+## Network event example
+
+```json
+{
+  "type": "execution.network.request",
+  "time": "2026-06-14T00:00:01Z",
+  "execution_id": "exec_123",
+  "route": "crm-readonly",
+  "decision": "allowed",
+  "method": "GET",
+  "scheme": "https",
+  "host": "crm.internal.example.com",
+  "path": "/api/customers/42",
+  "auth_profile": "crm-readonly",
+  "auth_injected": true,
+  "status_code": 200,
+  "request_bytes": 0,
+  "response_bytes": 2048,
+  "duration_ms": 83
+}
+```
+
+## Denial example
+
+```json
+{
+  "type": "policy.denied",
+  "time": "2026-06-14T00:00:02Z",
+  "execution_id": "exec_123",
+  "reason": "write_outside_workspace",
+  "path": "/Users/alice/.ssh/config",
+  "policy_id": "workspace-write"
+}
+```
+
+## Secret handling
+
+Audit events must not include raw secrets.
+
+- Authorization, Cookie, proxy credentials, API keys, and configured sensitive headers are redacted.
+- Environment values matching secret patterns are not logged.
+- Auth profile IDs may be logged; underlying credential material must not be logged.
+- Response bodies are not logged by default.
+
+## Storage and export
+
+Initial local format:
+
+```text
+.runseal/audit/<session_id>.jsonl
+```
+
+Expected export paths:
+
+- stdout JSONL for local debugging.
+- file JSONL for replay and support bundles.
+- OpenTelemetry logs/metrics for production deployments.
+- SIEM integration through collector pipelines.
+
+## Metrics
+
+Metrics should complement audit logs:
+
+- executions started/finished/failed
+- policy denies by reason
+- network requests by route/decision/status
+- resource limit exceedances
+- execution duration and output size histograms
+
+## Open questions
+
+- Should stdout/stderr event bodies be stored by default, summarized, or opt-in?
+- What event fields should be mandatory for OpenTelemetry semantic consistency?
+- How should audit retention be configured per workspace and enterprise deployment?
