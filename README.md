@@ -1,5 +1,7 @@
 # RunSeal RFCs
 
+English | [简体中文](README.zh-CN.md)
+
 RunSeal is a reusable Codex-style sandbox layer for AI agents.
 
 It wraps OS-native sandboxing on macOS, Linux, and Windows behind a stable policy protocol. Agent frameworks get safe local command execution without Docker, cloud VMs, or heavyweight infrastructure, while enterprises get controlled proxy networking, credential isolation, and structured audit logs.
