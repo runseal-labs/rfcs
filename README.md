@@ -51,14 +51,15 @@ flowchart LR
 6. [RFC-0006: Stable execution protocol](rfcs/0006-stable-execution-protocol.md)
 7. [RFC-0007: Platform backend threat model and capability matrix](rfcs/0007-platform-backend-threat-model.md)
 8. [RFC-0008: MVP implementation plan](rfcs/0008-mvp-implementation-plan.md)
+9. [RFC-0009: MVP implementation baseline](rfcs/0009-mvp-implementation-baseline.md)
 
 ## CLI vocabulary
 
 The primary CLI verb is `exec`:
 
 ```bash
-runseal exec --policy workspace-write -- pnpm test
-runseal exec --policy workspace-proxy -- python skill.py
+runseal exec --policy workspace-write --network proxy -- pnpm test
+runseal exec --policy workspace-contained --network disabled -- python skill.py
 ```
 
 The protocol method is `execute`; the returned domain object is an `Execution`, not a raw process.
@@ -83,4 +84,4 @@ These RFCs intentionally build on public industry signals:
 
 ## Status
 
-Draft. This repository is for crystallizing the public protocol and product boundary before implementation work begins in the open.
+PRD-ready for MVP. The RFC set defines implementation-ready boundaries for Windows and macOS first, with Linux kept as a future backend behind the same protocol.

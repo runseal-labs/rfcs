@@ -1,6 +1,6 @@
 # RFC-0005: Workspace/user simplification model
 
-- Status: Draft
+- Status: Accepted for MVP
 - Created: 2026-06-14
 - Project: RunSeal
 
@@ -126,8 +126,8 @@ Common local-agent workflows need Git and package managers. RunSeal should suppo
 - No hidden credential forwarding.
 - No exposing backend user complexity in the default API.
 
-## Open questions
+## Decisions for MVP
 
-- Which caches deserve built-in first-class names in v1?
-- How should RunSeal handle tools that require real-home assumptions?
-- Should same-user sandboxing be preferred over user namespaces when platform primitives are strong enough?
+- Built-in cache handling starts as explicit allowlists for Node, Python/uv, Git, ripgrep, and Rust/Cargo when detected. Additional caches must be added explicitly by policy until conformance tests justify first-class aliases.
+- Tools that assume the real home directory should run against a synthetic home with explicit cache/toolchain roots. If a tool still requires real-home access, the execution must fail with a clear policy error or require an explicit unsafe policy expansion.
+- RunSeal should prefer the strongest practical OS-native primitive per platform. Same-user sandboxing is acceptable only when the backend still enforces the declared read/write/network boundaries and reports capabilities honestly.

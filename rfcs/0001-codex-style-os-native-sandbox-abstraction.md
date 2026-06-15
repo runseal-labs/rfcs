@@ -1,6 +1,6 @@
 # RFC-0001: Codex-style OS-native sandbox abstraction
 
-- Status: Draft
+- Status: Accepted for MVP
 - Created: 2026-06-14
 - Project: RunSeal
 
@@ -88,8 +88,8 @@ This avoids treating command classification as a substitute for isolation.
 - No promise of complete protection from kernel-level vulnerabilities.
 - No direct secret injection into sandboxed processes.
 
-## Open questions
+## Decisions for MVP
 
-- Which Codex upstream components can be reused directly versus behaviorally mirrored?
-- How much backend-specific policy should be exposed for advanced users?
-- What minimum backend capability should be required before RunSeal claims a platform is supported?
+- RunSeal mirrors Codex-style product semantics, but keeps implementation independent unless an upstream component has an explicit compatible license and a clean integration boundary.
+- Backend-specific policy is not exposed in the public API for MVP. Advanced backend hints may exist only under explicit backend namespaces and must not be required by portable policies.
+- A platform is supported only when it can enforce filesystem policy, network `disabled`, structured setup failures, process cleanup, and audit events for the declared sandbox levels. Partial backends must report unsupported capabilities and fail closed.

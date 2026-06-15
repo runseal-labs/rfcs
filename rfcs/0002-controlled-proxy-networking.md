@@ -1,6 +1,6 @@
 # RFC-0002: Controlled proxy networking
 
-- Status: Draft
+- Status: Accepted for MVP
 - Created: 2026-06-14
 - Project: RunSeal
 
@@ -16,13 +16,13 @@ RunSeal turns network access from agent-held secrets into policy-governed proxy 
 
 ## Network modes
 
-### `none`
+### `disabled`
 
 No outbound network access.
 
 ```json
 {
-  "network": { "mode": "none" }
+  "network": { "mode": "disabled" }
 }
 ```
 
@@ -39,27 +39,22 @@ Default enterprise mode. The sandbox receives only proxy configuration. All outb
 }
 ```
 
-### `direct`
-
-Explicit development/debug mode. Direct network should not be the enterprise default.
-
-```json
-{
-  "network": {
-    "mode": "direct",
-    "allow_hosts": ["api.github.com"]
-  }
-}
-```
-
 ## Controlled proxy responsibilities
 
-- Default-deny egress.
+MVP responsibilities:
+
+- Provide a managed local HTTP proxy endpoint for sandboxed commands.
+- Keep direct egress blocked when `network.mode=proxy`.
+- Emit proxy lifecycle and request/denial audit events.
+- Keep real credentials outside sandbox process environment.
+- Fail closed if proxy mode is requested but the backend cannot restrict direct egress or create the proxy guard.
+
+Post-MVP enterprise responsibilities:
+
 - Domain, CIDR, method, path, and port allowlists.
 - SSRF and DNS rebinding protection, including denial of loopback, link-local metadata endpoints, and private CIDRs unless explicitly allowed.
 - Credential exchange and header injection.
 - mTLS or service identity injection.
-- Request and response metadata audit.
 - Header/body redaction where configured.
 - Rate limits and quotas per execution, skill, policy, or route.
 - Support for long-lived agent traffic such as SSE and WebSocket where policy permits.
@@ -135,8 +130,8 @@ Where possible, platform backends should prevent bypassing the proxy by denying 
 - Agent workload requirements: package managers, model APIs, internal APIs, SSE/WebSocket streams.
 - Zero-trust principle: credentials should remain at the boundary, not inside untrusted workload memory or environment.
 
-## Open questions
+## Decisions for MVP
 
-- Should RunSeal define a generic HTTP-only proxy first, then add database-specific MITM adapters later?
-- Should response body inspection be in scope for the open-source core or left to enterprise plugins?
-- How should proxy route definitions compose with organization-wide policy?
+- RunSeal starts with a generic HTTP proxy guard. Database-specific MITM adapters are outside the MVP and belong in later plugins or enterprise extensions.
+- Response body inspection is not required for the open-source MVP. The core records metadata and denial events, while body inspection/redaction remains an extension point.
+- Organization-wide route composition is post-MVP. MVP policies reference route IDs and emit auditable policy hashes; later admin policy can constrain the allowed route set without changing the execution protocol.

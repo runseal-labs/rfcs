@@ -1,6 +1,6 @@
 # RFC-0006: Stable execution protocol
 
-- Status: Draft
+- Status: Accepted for MVP
 - Created: 2026-06-14
 - Project: RunSeal
 
@@ -54,7 +54,7 @@ JSON-RPC gives simple request/response semantics and notifications for event str
 {
   "command": ["pnpm", "test"],
   "cwd": "/workspace",
-  "policy": "workspace-proxy",
+  "policy": "workspace-write-proxy",
   "env": {
     "CI": "1"
   },
@@ -86,7 +86,7 @@ Fields:
   "execution_id": "exec_01J...",
   "session_id": "sess_01J...",
   "seal_id": "seal_01J...",
-  "policy_id": "workspace-proxy",
+  "policy_id": "workspace-write-proxy",
   "policy_hash": "sha256:...",
   "status": "running"
 }
@@ -129,7 +129,7 @@ Statuses:
 A request may pass a named policy:
 
 ```json
-"workspace-proxy"
+"workspace-write-proxy"
 ```
 
 Or an inline policy:
@@ -177,8 +177,8 @@ Returns backend and feature capabilities for the current host.
 
 ```json
 {
-  "backend": "linux-bubblewrap",
-  "platform": "linux",
+  "backend": "macos-seatbelt",
+  "platform": "macos",
   "features": {
     "filesystem_policy": true,
     "network_proxy": true,
@@ -198,7 +198,7 @@ Resolves and validates a policy without running a command.
 {
   "method": "explainPolicy",
   "params": {
-    "policy": "workspace-proxy",
+    "policy": "workspace-write-proxy",
     "cwd": "/workspace"
   }
 }
@@ -218,7 +218,7 @@ Starts an execution.
   "params": {
     "command": ["python", "skill.py"],
     "cwd": "/workspace",
-    "policy": "workspace-proxy"
+    "policy": "workspace-write-proxy"
   }
 }
 ```
@@ -356,7 +356,7 @@ Initial stable error codes:
 The CLI is a thin protocol client:
 
 ```bash
-runseal exec --policy workspace-proxy -- python skill.py
+runseal exec --policy workspace-write-proxy -- python skill.py
 ```
 
 Maps to:
@@ -366,7 +366,7 @@ Maps to:
   "method": "execute",
   "params": {
     "command": ["python", "skill.py"],
-    "policy": "workspace-proxy"
+    "policy": "workspace-write-proxy"
   }
 }
 ```
@@ -386,9 +386,9 @@ CLI output modes:
 - Servers must reject unknown required feature flags.
 - Error `data.code` values are stable within v1.
 
-## Open questions
+## Decisions for MVP
 
-- Should approval be included in v1 as an interactive protocol, or left to host applications?
-- Should stdout/stderr stream chunks be base64-only, or allow UTF-8 text chunks when valid?
-- Should sessions be explicit (`createSession`) in v1, or implicit per execution until daemon use cases demand it?
-- Should MCP be a first-class transport profile or a separate adapter over this protocol?
+- Approval remains a host-application concern in v1. RunSeal can return `APPROVAL_REQUIRED`, but it does not own interactive approval UI or retry orchestration in the MVP.
+- Event stream chunks use base64 in v1. Clients may render UTF-8 after decoding, but wire encoding stays unambiguous for binary-safe logs.
+- Sessions are implicit per execution for CLI/stdio MVP. `session_id` exists for audit and cleanup, while explicit `createSession` can be added later for long-lived daemon use cases.
+- MCP is a separate adapter over the stable protocol, not a first-class transport profile in v1. This keeps the core protocol small and avoids coupling RunSeal to one agent tool ecosystem.

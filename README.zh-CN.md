@@ -78,14 +78,15 @@ MVP 的重点是跑通：
 6. [RFC-0006：Stable execution protocol](rfcs/0006-stable-execution-protocol.md)
 7. [RFC-0007：Platform backend threat model and capability matrix](rfcs/0007-platform-backend-threat-model.md)
 8. [RFC-0008：MVP implementation plan](rfcs/0008-mvp-implementation-plan.md)
+9. [RFC-0009：MVP implementation baseline](rfcs/0009-mvp-implementation-baseline.md)
 
 ## CLI 词汇
 
 主 CLI 动词是 `exec`：
 
 ```bash
-runseal exec --policy workspace-write -- pnpm test
-runseal exec --policy workspace-proxy -- python skill.py
+runseal exec --policy workspace-write --network proxy -- pnpm test
+runseal exec --policy workspace-contained --network disabled -- python skill.py
 ```
 
 协议方法名是 `execute`；返回的领域对象是 `Execution`，不是裸 process。
@@ -111,4 +112,4 @@ runseal exec --policy workspace-proxy -- python skill.py
 
 ## 状态
 
-Draft。本仓库用于在公开实现开始前沉淀 RunSeal 的协议、产品边界和实现计划。
+MVP PRD-ready。当前 RFC 集已经给出 Windows 和 macOS 优先的可实现边界；Linux 保留为未来后端，继续复用同一协议抽象。

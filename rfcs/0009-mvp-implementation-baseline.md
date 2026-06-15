@@ -1,0 +1,102 @@
+# RFC-0009: MVP implementation baseline
+
+- Status: Accepted for MVP
+- Created: 2026-06-15
+- Project: RunSeal
+
+## Summary
+
+This RFC records the PRD-readiness review for the RunSeal RFC set. The goal is to make the repository implementation-ready for AI coding agents without relying on chat-only context or private implementation provenance.
+
+Conclusion: the RFC set is PRD-ready for a Windows + macOS MVP. The remaining unresolved items are intentionally marked as post-MVP extension points and do not block starting implementation.
+
+## External evidence reviewed
+
+The current direction is supported by public sources and comparable open-source implementations:
+
+- OpenAI Codex docs: sandbox and approval are separate controls; local commands use OS-enforced sandboxing; default local posture limits writes to the workspace and keeps network off unless configured; network proxy constrains enabled network access.
+  - https://developers.openai.com/codex/concepts/sandboxing
+  - https://developers.openai.com/codex/agent-approvals-security
+  - https://developers.openai.com/codex/permissions
+- Claude Code sandboxing references: macOS Seatbelt and Linux bubblewrap patterns validate the OS-native local sandbox direction; permission prompts and sandbox enforcement are separate layers.
+  - https://code.claude.com/docs/en/sandboxing
+  - https://www.claudecodecamp.com/p/claude-code-sandboxing-how-sandbox-works-and-what-it-doesn-t-protect
+- Gemini CLI sandbox docs: validate macOS Seatbelt profiles, container-based alternatives, network/proxy modes, and explicit mount/permission configuration as common agent-sandbox UX patterns.
+  - https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/sandbox.md
+- Arapuca: cross-platform Rust process sandbox using Linux Landlock/seccomp/cgroups/netns, macOS Seatbelt, and Windows AppContainer/Job Objects/restricted tokens, with fail-closed posture.
+  - https://github.com/sergio-correia/arapuca
+- Landstrip: coding-agent sandbox using Landlock, Seatbelt, and LPAC AppContainer; accepts a policy subset and explicitly reports unsupported Windows network policies.
+  - https://github.com/jarkkojs/landstrip
+- Heel: native OS-level sandbox for LLM-generated code with macOS Seatbelt, Linux Landlock/seccomp, planned Windows AppContainer, network policies, and credential/home protection controls.
+  - https://github.com/lexoliu/heel
+
+These sources support RunSeal's public positioning: a lightweight OS-native local sandbox layer with a stable protocol, policy/audit model, Windows and macOS first-class MVP support, and Linux deferred behind the same abstraction.
+
+## Accepted MVP boundaries
+
+The following boundaries are accepted and implementation-ready:
+
+1. **Product scope**: RunSeal is a local OS-native execution sandbox layer for AI agents, not a hosted sandbox service, Docker replacement, VM platform, or cloud multi-tenant control plane.
+2. **Platform priority**: Windows and macOS are first-class MVP platforms. Linux remains a future backend behind the same abstraction.
+3. **Public policy model**: filesystem sandbox level and network mode are separate dimensions.
+4. **Sandbox levels**: `read-only`, `workspace-contained`, `workspace-write`, and `danger-full-access` are the MVP filesystem levels.
+5. **Network modes**: `disabled` and `proxy` are the MVP network modes. Unmanaged direct networking is outside the MVP policy surface.
+6. **Fail-closed posture**: unsupported or partially enforceable policies must return structured errors; the implementation must not silently fall back to unrestricted execution.
+7. **Windows backend target**: use restricted local execution identity plus OS policy controls such as ACLs, restricted tokens, Job Objects/AppContainer where available, and network restrictions/proxy-only egress.
+8. **macOS backend target**: use `/usr/bin/sandbox-exec` with generated Seatbelt profiles, safe dynamic path injection, canonical/raw path modeling, and proxy-only egress when network is enabled.
+9. **Linux posture**: do not implement Linux in MVP; return unsupported for sandboxed execution unless the request explicitly uses `danger-full-access` local execution.
+10. **Proxy posture**: MVP starts with a managed HTTP proxy guard and proxy lifecycle audit events. Domain/CIDR/method/path rules and body inspection are post-MVP extensions.
+11. **Secrets posture**: real credentials stay outside sandbox process environment. Credential injection belongs at the proxy boundary or future trusted host extensions.
+12. **Protocol shape**: JSON-RPC 2.0 over stdio is the MVP transport; Unix socket/named pipe/HTTP bridge can follow without changing method semantics.
+13. **Execution object**: the public model is `Execution`; the CLI verb is `runseal exec`; raw process spawning remains an implementation detail.
+14. **Audit model**: JSONL audit events are required for execution lifecycle, policy decisions, denials, backend setup failures, proxy lifecycle, and final results.
+15. **Approval boundary**: approval UI/orchestration remains a host-application concern in v1. RunSeal returns `APPROVAL_REQUIRED` where needed but does not own interactive approval flow in MVP.
+16. **MCP boundary**: MCP is an adapter over the stable protocol, not a core v1 transport.
+17. **Public terminology**: public docs and code must use RunSeal terminology only and must not include private product names, internal repository names, private issue/MR IDs, customer names, or chat artifacts.
+
+## Implementation-ready work packages
+
+The first coding pass can start without further product clarification:
+
+1. Create the Rust workspace/crate skeleton described in RFC-0008.
+2. Implement the policy model and canonical JSON validation for RFC-0003.
+3. Implement `runseal exec`, `runseal capabilities`, and `runseal explain-policy` CLI shells.
+4. Implement the backend trait and capability reporting.
+5. Implement explicit local execution for `danger-full-access` as the non-sandbox baseline.
+6. Implement macOS Seatbelt backend for `read-only`, `workspace-write`, and a first-pass `workspace-contained`.
+7. Implement Windows backend scaffolding with fail-closed capability checks and the declared acceptance tests.
+8. Implement JSONL audit writer and event schema alignment with RFC-0004.
+9. Implement JSON-RPC stdio methods from RFC-0006.
+10. Add conformance tests that distinguish supported, unsupported, denied, failed, and skipped states.
+
+## Acceptance criteria for the RFC set
+
+The RFC set reaches PRD-ready state when all of the following are true:
+
+- README and README.zh-CN describe the same public product boundary and link to all RFCs.
+- RFC-0001 defines the OS-native abstraction and closes upstream reuse/backend exposure questions for MVP.
+- RFC-0002 defines `disabled` and `proxy` as MVP network modes, with direct/domain routing/body inspection deferred.
+- RFC-0003 defines stable policy shape, canonical JSON, MVP profiles, and strict effective-policy hashing.
+- RFC-0004 defines event envelopes and MVP audit retention/output-body decisions.
+- RFC-0005 defines synthetic home, cache posture, and explicit real-home handling.
+- RFC-0006 defines JSON-RPC stdio MVP, error model, event streaming, and closed protocol decisions.
+- RFC-0007 defines threat model, platform matrix, Windows/macOS backend expectations, Linux deferral, and fail-closed requirements.
+- RFC-0008 defines implementation phases, work packages, conformance tests, and technical-preview acceptance criteria.
+- No RFC or README contains private/internal product references or transient chat artifacts.
+
+## Remaining non-blockers
+
+The following are intentionally not required before MVP coding begins:
+
+- Full enterprise route composition and organization-wide policy inheritance.
+- Response body inspection/redaction plugins.
+- Linux backend implementation.
+- VM/microVM/container daemon backends.
+- Interactive approval UI.
+- MCP server implementation.
+- Complete automatic discovery of every package-manager cache and language runtime.
+- Long-lived explicit session APIs beyond implicit execution sessions.
+
+## Review decision
+
+The RFC set is accepted as the MVP PRD baseline for implementation. Future changes should be filed as follow-up RFCs or amendments when they expand scope beyond the accepted MVP boundary.

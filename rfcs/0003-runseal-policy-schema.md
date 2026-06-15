@@ -1,6 +1,6 @@
 # RFC-0003: RunSeal policy schema
 
-- Status: Draft
+- Status: Accepted for MVP
 - Created: 2026-06-14
 - Project: RunSeal
 
@@ -21,8 +21,8 @@ RunSeal policies define what an execution may read, write, execute, connect to, 
 ```json
 {
   "version": "runseal.policy/v1",
-  "id": "workspace-proxy",
-  "description": "Workspace write access with controlled proxy networking",
+  "id": "workspace-write",
+  "description": "Workspace write access with proxy networking",
   "filesystem": {},
   "process": {},
   "network": {},
@@ -85,11 +85,10 @@ Rules:
 
 Modes:
 
-- `none`
+- `disabled`
 - `proxy`
-- `direct`
 
-Enterprise default should be `proxy` or `none`.
+Enterprise default should be `proxy` or `disabled`; unmanaged `direct` networking is not part of the MVP policy surface.
 
 ## Environment policy
 
@@ -165,14 +164,14 @@ Portable policy should not require these fields.
 Initial profile names:
 
 - `read-only`
+- `workspace-contained`
 - `workspace-write`
-- `workspace-proxy`
-- `test-runner`
-- `package-manager-proxy`
-- `full-access` (unsafe, explicit only)
+- `danger-full-access` (unsafe, explicit only)
 
-## Open questions
+`network.mode` is selected independently as `disabled` or `proxy`. Profiles may provide defaults, but the schema keeps filesystem level and network mode as separate dimensions.
 
-- Should policy be JSON-first with YAML as a convenience, or both normative?
-- How should policy inheritance/imports work without hiding effective permissions?
-- Should package manager cache access be a first-class concept?
+## Decisions for MVP
+
+- JSON is normative for v1. YAML may be accepted by the CLI as a convenience only after parsing into the same canonical JSON policy.
+- Policy inheritance/imports are post-MVP. MVP must materialize one effective policy object and policy hash before execution so permissions are never hidden.
+- Package-manager cache access is represented as explicit `runtime.cacheRoots` / read-only roots in MVP, not a separate policy dimension. Built-in cache aliases can be added later once conformance tests cover them.

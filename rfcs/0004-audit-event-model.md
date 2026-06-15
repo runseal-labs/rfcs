@@ -1,6 +1,6 @@
 # RFC-0004: Audit event model
 
-- Status: Draft
+- Status: Accepted for MVP
 - Created: 2026-06-14
 - Project: RunSeal
 
@@ -25,7 +25,7 @@ RunSeal emits structured audit events for executions, policy decisions, sandbox 
   "runseal_version": "0.1.0",
   "execution_id": "exec_123",
   "session_id": "sess_123",
-  "policy_id": "workspace-proxy",
+  "policy_id": "workspace-write",
   "policy_hash": "sha256:...",
   "actor": {
     "type": "agent",
@@ -146,8 +146,8 @@ Metrics should complement audit logs:
 - resource limit exceedances
 - execution duration and output size histograms
 
-## Open questions
+## Decisions for MVP
 
-- Should stdout/stderr event bodies be stored by default, summarized, or opt-in?
-- What event fields should be mandatory for OpenTelemetry semantic consistency?
-- How should audit retention be configured per workspace and enterprise deployment?
+- Store stdout/stderr byte counts and bounded stream chunks in event streams. Durable JSONL audit stores output metadata by default; full output body retention is opt-in because logs can contain secrets.
+- Mandatory MVP event fields are `type`, `time`, `execution_id`, `policy_id`, `policy_hash`, `backend`, and a family-specific `decision` or result payload when applicable. OpenTelemetry export can map from these fields later.
+- Retention is local and workspace/session scoped in MVP. Enterprise retention policy is an extension point over the same JSONL event format.
