@@ -25,6 +25,8 @@ RunSeal follows the Codex-style model:
 4. [RFC-0004: Audit event model](rfcs/0004-audit-event-model.md)
 5. [RFC-0005: Workspace/user simplification model](rfcs/0005-workspace-user-simplification-model.md)
 6. [RFC-0006: Stable execution protocol](rfcs/0006-stable-execution-protocol.md)
+7. [RFC-0007: Platform backend threat model and capability matrix](rfcs/0007-platform-backend-threat-model.md)
+8. [RFC-0008: MVP implementation plan](rfcs/0008-mvp-implementation-plan.md)
 
 ## CLI vocabulary
 
