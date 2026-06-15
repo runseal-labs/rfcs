@@ -28,6 +28,28 @@ RunSeal 采用 Codex-style 的分层模型：
 
 公开 API 保持平台无关：客户端只需要理解 `read-only`、`workspace-contained`、`workspace-write`、`danger-full-access` 等 sandbox level，以及 `disabled` / `proxy` 网络模式；不需要关心 Windows ACL、macOS Seatbelt profile 或未来 Linux namespace 的具体实现。
 
+
+## 架构流程
+
+```mermaid
+flowchart LR
+  Agent[Agent framework] --> Protocol[RunSeal CLI / JSON-RPC]
+  Protocol --> Policy[Policy engine]
+  Policy --> Backend{Platform backend}
+
+  Backend --> Windows[Windows sandbox backend]
+  Backend --> MacOS[macOS Seatbelt backend]
+  Backend --> Linux[Linux backend future]
+
+  Windows --> Exec[Sandboxed execution]
+  MacOS --> Exec
+  Linux --> Exec
+
+  Exec --> Audit[JSONL audit events]
+  Exec --> Proxy[Managed proxy]
+  Proxy --> Network[External network]
+```
+
 ## MVP 优先级
 
 当前 RFC 将 Windows 和 macOS 作为 MVP 一等平台：

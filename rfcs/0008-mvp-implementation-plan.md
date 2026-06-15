@@ -40,6 +40,30 @@ RunSeal public APIs should use stable, platform-neutral names:
 
 Do not expose backend-private controls such as Windows profile names, macOS Seatbelt profile fragments, SIDs, ACL details, WFP rule names, sandbox-exec flags, or app-specific setting names in the public model.
 
+
+## Execution flow
+
+```mermaid
+sequenceDiagram
+  participant Client as Agent client / CLI
+  participant Protocol as RunSeal protocol
+  participant Policy as Policy engine
+  participant Backend as Platform backend
+  participant Proxy as Managed proxy
+  participant Audit as Audit writer
+
+  Client->>Protocol: execute(request)
+  Protocol->>Policy: normalize + validate policy
+  Policy->>Backend: compile sandbox plan
+  Backend->>Proxy: start if network=proxy
+  Backend->>Audit: emit execution.started
+  Backend->>Backend: run command in sandbox
+  Backend->>Audit: emit stdout/stderr/policy events
+  Backend->>Proxy: stop proxy guard
+  Backend->>Protocol: execution result
+  Protocol->>Client: result + event stream
+```
+
 ## MVP scope
 
 ### Phase 0: Repository and crate structure

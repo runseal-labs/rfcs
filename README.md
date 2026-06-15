@@ -19,6 +19,28 @@ RunSeal follows the Codex-style model:
 - **Execution**: a single command or tool run inside a seal.
 - **Controlled proxy**: the only network path for enterprise use, able to enforce routes, inject auth, redact data, and audit traffic.
 
+
+## Architecture flow
+
+```mermaid
+flowchart LR
+  Agent[Agent framework] --> Protocol[RunSeal CLI / JSON-RPC]
+  Protocol --> Policy[Policy engine]
+  Policy --> Backend{Platform backend}
+
+  Backend --> Windows[Windows sandbox backend]
+  Backend --> MacOS[macOS Seatbelt backend]
+  Backend --> Linux[Linux backend future]
+
+  Windows --> Exec[Sandboxed execution]
+  MacOS --> Exec
+  Linux --> Exec
+
+  Exec --> Audit[JSONL audit events]
+  Exec --> Proxy[Managed proxy]
+  Proxy --> Network[External network]
+```
+
 ## Initial RFC set
 
 1. [RFC-0001: Codex-style OS-native sandbox abstraction](rfcs/0001-codex-style-os-native-sandbox-abstraction.md)
