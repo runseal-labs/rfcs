@@ -347,7 +347,7 @@ Initial stable error codes:
 | `POLICY_INVALID` | Policy failed validation. |
 | `POLICY_DENIED` | Policy denied the request. |
 | `APPROVAL_REQUIRED` | The request needs approval not available in this protocol call. |
-| `BACKEND_UNAVAILABLE` | No suitable backend exists on this host. |
+| `BACKEND_UNAVAILABLE` | No suitable backend exists on this host, or the selected backend cannot be initialized. |
 | `BACKEND_CAPABILITY_MISSING` | Required backend capability is unavailable. |
 | `EXECUTION_NOT_FOUND` | Execution ID is unknown. |
 | `EXECUTION_FAILED_TO_START` | Backend prepared but command could not start. |
