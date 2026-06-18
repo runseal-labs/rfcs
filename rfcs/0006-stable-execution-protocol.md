@@ -186,6 +186,7 @@ Returns backend and feature capabilities for the current host.
     "process_isolation": true,
     "process_cleanup": true,
     "network_proxy": true,
+    "managed_proxy": true,
     "direct_network_deny": true,
     "resource_limits": true,
     "audit_jsonl": true,

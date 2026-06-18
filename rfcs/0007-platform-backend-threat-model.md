@@ -59,7 +59,7 @@ The public policy surface is shared across all platforms:
 `danger-full-access` is local execution. It does not claim filesystem or network hard boundaries.
 
 All other sandbox levels must use the platform backend when supported. If RunSeal cannot enforce the requested policy, it must fail closed with a structured error. A backend may report an experimental or unsupported capability, but it must not silently present partial enforcement as strong sandboxing.
-Sandboxed policies require explicit backend capability for filesystem policy, runtime roots, runtime environment redirects, process isolation, process cleanup, direct network denial, and the requested network mode.
+Sandboxed policies require explicit backend capability for filesystem policy, runtime roots, runtime environment redirects, process isolation, process cleanup, direct network denial, and the requested network mode. When proxy mode is requested, the backend must also report managed proxy capability.
 
 ## Capability matrix
 
