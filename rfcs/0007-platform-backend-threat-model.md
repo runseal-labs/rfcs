@@ -85,6 +85,7 @@ Required behavior:
 
 - Use one low-privilege sandbox identity/group model for sandboxed commands.
 - Use ACLs and restricted process tokens to enforce read/write roots.
+- Platform plan previews may expose logical process boundary state such as restricted local process, low-privilege identity requirement, and process-tree cleanup requirement, but must not expose SIDs, token attributes, integrity levels, Job Object handles, helper identities, or host-specific profile names.
 - Redirect HOME, AppData, LocalAppData, Temp, and Tmp to the sandbox runtime root.
 - Platform plan previews may expose logical runtime environment redirects such as HOME, USERPROFILE, APPDATA, LOCALAPPDATA, TEMP, TMP, RUNSEAL_HOME, and RUNSEAL_TMP, but must not expose backend-private identity, ACL, token, firewall, or helper details.
 - Protect the real user profile and common credential directories from sandboxed reads in `workspace-contained`.
