@@ -81,6 +81,7 @@ MVP 的重点是跑通：
 7. [RFC-0007：Platform backend threat model and capability matrix](rfcs/0007-platform-backend-threat-model.md)
 8. [RFC-0008：MVP implementation plan](rfcs/0008-mvp-implementation-plan.md)
 9. [RFC-0009：MVP implementation baseline](rfcs/0009-mvp-implementation-baseline.md)
+10. [RFC-0010：RFC/implementation boundary and Windows reference extraction](rfcs/0010-rfc-implementation-boundary-and-windows-reference-extraction.md)
 
 ## CLI 词汇
 
