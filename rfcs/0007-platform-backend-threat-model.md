@@ -93,6 +93,7 @@ Required behavior:
 - Enforce `network.disabled` through OS-level network restrictions.
 - Enforce `network.proxy` as proxy-only egress: sandboxed processes may reach the managed proxy endpoint but must not bypass it with direct outbound connections.
 - Platform plan previews may expose logical network guard state such as direct egress denial and managed proxy requirement, but must not expose firewall rule names, WFP callouts, helper identities, or endpoint secrets.
+- Platform plan previews may expose logical setup requirements such as runtime root preparation, runtime environment redirects, runtime cleanup, network guard setup, managed proxy setup, and fail-closed-on-setup-error state, but must not expose helper identities, rule names, handles, tokens, or backend-private helper paths.
 - Treat helper/setup/repair failures as hard failures, not soft warnings.
 
 Known gaps and constraints:
