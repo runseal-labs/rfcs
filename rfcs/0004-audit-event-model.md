@@ -59,6 +59,7 @@ RunSeal emits structured audit events for executions, policy decisions, sandbox 
 ### Sandbox backend
 
 - `sandbox.prepared`
+- `sandbox.setup_failed`
 - `sandbox.backend_capability`
 - `sandbox.backend_warning`
 - `sandbox.cleanup`
