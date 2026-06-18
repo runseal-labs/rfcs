@@ -43,16 +43,17 @@ The following boundaries are accepted and implementation-ready:
 5. **Network modes**: `disabled` and `proxy` are the MVP network modes. Unmanaged direct networking is outside the MVP policy surface.
 6. **Fail-closed posture**: unsupported or partially enforceable policies must return structured errors; the implementation must not silently fall back to unrestricted execution.
 7. **Windows backend target**: use restricted local execution identity plus OS policy controls such as ACLs, restricted tokens, Job Objects/AppContainer where available, and network restrictions/proxy-only egress.
-8. **macOS backend target**: use `/usr/bin/sandbox-exec` with generated Seatbelt profiles, safe dynamic path injection, canonical/raw path modeling, and proxy-only egress when network is enabled, but treat macOS as experimental until conformance evidence proves each supported capability.
-9. **Linux posture**: do not implement Linux in MVP; return unsupported for sandboxed execution unless the request explicitly uses `danger-full-access` local execution.
-10. **Proxy posture**: MVP starts with a managed HTTP proxy guard and proxy lifecycle audit events. Domain/CIDR/method/path rules and body inspection are post-MVP extensions.
-11. **Secrets posture**: real credentials stay outside sandbox process environment. Credential injection belongs at the proxy boundary or future trusted host extensions.
-12. **Protocol shape**: JSON-RPC 2.0 over stdio is the MVP transport; Unix socket/named pipe/HTTP bridge can follow without changing method semantics.
-13. **Execution object**: the public model is `Execution`; the CLI verb is `runseal exec`; raw process spawning remains an implementation detail.
-14. **Audit model**: JSONL audit events are required for execution lifecycle, policy decisions, denials, backend setup failures, proxy lifecycle, and final results.
-15. **Approval boundary**: approval UI/orchestration remains a host-application concern in v1. RunSeal returns `APPROVAL_REQUIRED` where needed but does not own interactive approval flow in MVP.
-16. **MCP boundary**: MCP is an adapter over the stable protocol, not a core v1 transport.
-17. **Public terminology**: public docs and code must use RunSeal terminology only and must not include private product names, internal repository names, private issue/MR IDs, customer names, or chat artifacts.
+8. **Windows identity and epoch model**: Windows MVP uses one private sandbox identity, one active effective policy cohort, immutable per-execution `policy_hash`/`policy_epoch`, same-policy concurrency only, and fail-closed mixed-policy transitions.
+9. **macOS backend target**: use `/usr/bin/sandbox-exec` with generated Seatbelt profiles, safe dynamic path injection, canonical/raw path modeling, and proxy-only egress when network is enabled, but treat macOS as experimental until conformance evidence proves each supported capability.
+10. **Linux posture**: do not implement Linux in MVP; return unsupported for sandboxed execution unless the request explicitly uses `danger-full-access` local execution.
+11. **Proxy posture**: MVP starts with a managed HTTP proxy guard and proxy lifecycle audit events. Domain/CIDR/method/path rules and body inspection are post-MVP extensions.
+12. **Secrets posture**: real credentials stay outside sandbox process environment. Credential injection belongs at the proxy boundary or future trusted host extensions.
+13. **Protocol shape**: JSON-RPC 2.0 over stdio is the MVP transport; Unix socket/named pipe/HTTP bridge can follow without changing method semantics.
+14. **Execution object**: the public model is `Execution`; the CLI verb is `runseal exec`; raw process spawning remains an implementation detail.
+15. **Audit model**: JSONL audit events are required for execution lifecycle, policy decisions, denials, backend setup failures, proxy lifecycle, and final results.
+16. **Approval boundary**: approval UI/orchestration remains a host-application concern in v1. RunSeal returns `APPROVAL_REQUIRED` where needed but does not own interactive approval flow in MVP.
+17. **MCP boundary**: MCP is an adapter over the stable protocol, not a core v1 transport.
+18. **Public terminology**: public docs and code must use RunSeal terminology only and must not include private product names, internal repository names, private issue/MR IDs, customer names, or chat artifacts.
 
 ## Implementation-ready work packages
 
@@ -84,6 +85,7 @@ The RFC set reaches PRD-ready state when all of the following are true:
 - RFC-0008 defines implementation phases, work packages, conformance tests, and technical-preview acceptance criteria.
 - RFC-0010 defines the RFC/implementation repository boundary, Windows reference extraction rules, redaction requirements, and conformance gates.
 - RFC-0011 defines the binary-safe `stdin.bytes` request encoding and audit boundary.
+- RFC-0012 defines the Windows single-identity model, global policy epoch invariants, and freeze-gate requirements.
 - No RFC or README contains private/internal product references or transient chat artifacts.
 
 ## Remaining non-blockers

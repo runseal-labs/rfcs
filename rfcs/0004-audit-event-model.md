@@ -27,6 +27,7 @@ RunSeal emits structured audit events for executions, policy decisions, sandbox 
   "session_id": "sess_123",
   "policy_id": "workspace-write",
   "policy_hash": "sha256:...",
+  "policy_epoch": "epoch_01J...",
   "actor": {
     "type": "agent",
     "id": "agent_123"
@@ -150,5 +151,6 @@ Metrics should complement audit logs:
 ## Decisions for MVP
 
 - Store stdout/stderr byte counts and bounded stream chunks in event streams. Durable JSONL audit stores output metadata by default; full output body retention is opt-in because logs can contain secrets.
-- Mandatory MVP event fields are `type`, `time`, `execution_id`, `policy_id`, `policy_hash`, `backend`, and a family-specific `decision` or result payload when applicable. OpenTelemetry export can map from these fields later.
+- Mandatory MVP fields for execution-scoped events are `type`, `time`, `runseal_version`, `execution_id`, `policy_id`, `policy_hash`, `policy_epoch`, `backend`, and a family-specific `decision` or result payload when applicable. OpenTelemetry export can map from these fields later.
+- Backend setup events that happen before an execution exists MUST still include `type`, `time`, `runseal_version`, `backend`, a structured error or decision payload, and any resolved policy fields available at the time of failure.
 - Retention is local and workspace/session scoped in MVP. Enterprise retention policy is an extension point over the same JSONL event format.

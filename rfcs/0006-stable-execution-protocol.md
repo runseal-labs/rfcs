@@ -59,6 +59,8 @@ Changing the global sandbox policy is a **policy epoch transition**:
 - A policy transition MUST occur only when there are no active sandboxed executions, or it MUST fail closed.
 - A backend MAY terminate old-epoch executions at transition time rather than blocking the transition.
 - Mixed effective-policy concurrency under the same sandbox identity is outside the MVP.
+- `policy_hash` and `policy_epoch` are bound before process start and MUST remain immutable for the lifetime of the execution.
+- Every execution-scoped event and final result MUST echo the same `policy_hash` and `policy_epoch` that were bound at start.
 
 **Design invariants:**
 
@@ -109,9 +111,12 @@ Fields:
   "seal_id": "seal_01J...",
   "policy_id": "workspace-write-proxy",
   "policy_hash": "sha256:...",
+  "policy_epoch": "epoch_01J...",
   "status": "running"
 }
 ```
+
+`policy_epoch` is an opaque global enforcement generation marker for the sandbox identity. The Windows reference backend MAY use the effective policy hash as the epoch identifier for the stdio MVP, but clients MUST treat the field as opaque.
 
 Statuses:
 
@@ -129,6 +134,9 @@ Statuses:
 {
   "execution_id": "exec_01J...",
   "status": "finished",
+  "policy_id": "workspace-write-proxy",
+  "policy_hash": "sha256:...",
+  "policy_epoch": "epoch_01J...",
   "exit_code": 0,
   "signal": null,
   "started_at": "2026-06-14T00:00:00Z",
@@ -316,7 +324,11 @@ Events use JSON-RPC notifications. They do not have an `id`.
   "params": {
     "type": "execution.stdout",
     "time": "2026-06-14T00:00:01Z",
+    "runseal_version": "0.1.0",
     "execution_id": "exec_01J...",
+    "policy_id": "workspace-write-proxy",
+    "policy_hash": "sha256:...",
+    "policy_epoch": "epoch_01J...",
     "data": "base64:SGVsbG8K",
     "encoding": "base64",
     "stream_offset": 0
@@ -367,6 +379,7 @@ Initial stable error codes:
 | `INVALID_REQUEST` | Request payload is malformed or unsupported. |
 | `POLICY_INVALID` | Policy failed validation. |
 | `POLICY_DENIED` | Policy denied the request. |
+| `POLICY_TRANSITION_BUSY` | A policy epoch transition or mixed-policy execution was rejected because sandboxed executions are still active. |
 | `APPROVAL_REQUIRED` | The request needs approval not available in this protocol call. |
 | `BACKEND_UNAVAILABLE` | No suitable backend exists on this host, or the selected backend cannot be initialized. |
 | `BACKEND_CAPABILITY_MISSING` | Required backend capability is unavailable. |

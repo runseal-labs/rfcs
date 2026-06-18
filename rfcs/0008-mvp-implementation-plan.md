@@ -114,6 +114,7 @@ Validation rules:
 - `proxy` mode requires a managed proxy plan.
 - Unsupported backend/policy combinations fail closed.
 - Environment inheritance defaults to minimal/safe values instead of full host inheritance.
+- `policy_hash` and `policy_epoch` are bound before process start and remain immutable across all execution events and the final result.
 
 ### Phase 2: Backend trait and platform selection
 
@@ -215,6 +216,7 @@ Write one JSONL audit stream per execution or per session. Include:
 
 - execution id
 - policy digest
+- policy epoch
 - backend platform
 - sandbox level
 - network mode
@@ -263,6 +265,11 @@ Minimum test categories:
 8. Cancellation behavior.
 9. Structured audit event shape.
 10. JSON-RPC compatibility snapshots.
+11. Policy epoch immutability and same-policy cohort consistency.
+12. Mixed-policy rejection while sandboxed executions are active.
+13. Per-execution runtime root, synthetic home, temp, and environment isolation.
+14. Execution-scoped process cleanup without affecting unrelated executions.
+15. Windows legacy dual-user setup artifact rejection.
 
 Tests that cannot run on the current host should skip with a structured reason, not pass silently.
 
@@ -305,4 +312,5 @@ The MVP is ready for public technical preview when:
 5. JSONL audit events are emitted for successful executions, denials, cancellations, and backend setup failures.
 6. JSON-RPC stdio supports execution lifecycle and event subscription.
 7. Conformance tests can distinguish supported, unsupported, experimental, denied, and failed states.
-8. Public documentation contains no private/internal product references.
+8. Windows semantic freeze tests pass for single identity, policy epoch immutability, same-policy concurrency, mixed-policy rejection, per-execution runtime isolation, execution-scoped cleanup, and legacy dual-user setup rejection.
+9. Public documentation contains no private/internal product references.

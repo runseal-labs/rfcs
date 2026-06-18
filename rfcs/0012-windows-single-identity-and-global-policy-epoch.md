@@ -43,6 +43,51 @@ The following invariants apply to all Windows MVP backends:
 5. Execution cleanup is per-execution (job/process tree), not per sandbox user (no mass kill).
 6. Runtime roots, synthetic home, and temporary directories remain per-execution even when policy enforcement is shared.
 
+## Execution binding semantics
+
+Before starting a sandboxed process, the Windows backend MUST:
+
+1. Normalize the requested policy into the effective enforcement state.
+2. Compute the effective `policy_hash`.
+3. Compare the requested `policy_hash` with the `policy_hash` bound to the active `policy_epoch` for the sandbox identity.
+4. If no sandboxed executions are active and the hash differs, create or activate a new `policy_epoch`.
+5. If sandboxed executions are active, require the requested hash to match the active epoch's `policy_hash`.
+6. Create an `Execution` and bind it to the active `policy_hash` and `policy_epoch`.
+7. Increment the active execution count for that epoch before process start.
+
+If the requested `policy_hash` differs from the active epoch while sandboxed executions are active, the backend MUST reject the request fail-closed with `POLICY_TRANSITION_BUSY` or an equivalent structured error. It MUST NOT spawn the process and MUST NOT mutate global enforcement state.
+
+For a started execution, `policy_hash` and `policy_epoch` are immutable. Every execution-scoped audit event, JSON-RPC event notification, and final `ExecutionResult` MUST echo the same values.
+
+## Runtime isolation semantics
+
+Shared policy enforcement does not imply shared runtime state. Every sandboxed execution MUST receive its own runtime root, synthetic home/profile roots, temporary directory, environment block, process tree, and cleanup scope.
+
+The Windows backend MUST prevent one execution from reading or writing another execution's runtime root unless an explicit future policy extension allows that behavior. Cleanup MUST terminate only the process tree associated with the target execution and MUST NOT mass-kill by sandbox identity.
+
+## Network semantics
+
+`network.disabled` MUST block direct egress at the OS enforcement boundary. `network.proxy` MUST allow only the managed proxy path and MUST block direct socket bypass. Unmanaged direct networking remains outside the MVP policy surface.
+
+## Freeze gate requirements
+
+The implementation repository MUST include automated semantic tests, runnable on Windows locally and later in CI, for at least:
+
+- Format and static checks for Rust code.
+- Protocol and audit event shape, including `runseal_version`, `policy_hash`, and `policy_epoch`.
+- Execution immutability for `policy_hash` and `policy_epoch`.
+- Same-policy concurrency sharing one epoch.
+- Mixed-policy execution rejection while active executions exist.
+- Policy transition gating and post-drain epoch activation.
+- Per-execution runtime root, synthetic home, temp, and environment isolation.
+- Execution-scoped process cleanup without affecting unrelated executions.
+- `network.disabled` blocking direct egress.
+- `network.proxy` blocking direct socket bypass and requiring the managed proxy path.
+- Legacy dual-user setup artifact detection with structured fail-closed behavior.
+- Unsupported capability requests failing closed instead of falling back to unrestricted execution.
+
+RunSeal MUST NOT claim the Windows backend has reached the semantic freeze gate until these tests pass on the Windows reference backend.
+
 ## Cross-references
 
 - **RFC-0003 §Effective policy hash:** hash composition requirements.
