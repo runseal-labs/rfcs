@@ -88,6 +88,7 @@ Required behavior:
 - Redirect HOME, AppData, LocalAppData, Temp, and Tmp to the sandbox runtime root.
 - Platform plan previews may expose logical runtime environment redirects such as HOME, USERPROFILE, APPDATA, LOCALAPPDATA, TEMP, TMP, RUNSEAL_HOME, and RUNSEAL_TMP, but must not expose backend-private identity, ACL, token, firewall, or helper details.
 - Protect the real user profile and common credential directories from sandboxed reads in `workspace-contained`.
+- Platform plan previews may expose logical protected filesystem categories such as workspace metadata, host profile, and credential roots, but must not expose resolved host-profile or credential paths.
 - Deny writes outside allowed roots in `read-only`, `workspace-contained`, and `workspace-write`.
 - Keep workspace metadata such as `.git`, `.agents`, and `.codex` non-writable by default.
 - Enforce `network.disabled` through OS-level network restrictions.
