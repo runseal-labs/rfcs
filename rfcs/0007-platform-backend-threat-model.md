@@ -92,6 +92,7 @@ Required behavior:
 - Keep workspace metadata such as `.git`, `.agents`, and `.codex` non-writable by default.
 - Enforce `network.disabled` through OS-level network restrictions.
 - Enforce `network.proxy` as proxy-only egress: sandboxed processes may reach the managed proxy endpoint but must not bypass it with direct outbound connections.
+- Platform plan previews may expose logical network guard state such as direct egress denial and managed proxy requirement, but must not expose firewall rule names, WFP callouts, helper identities, or endpoint secrets.
 - Treat helper/setup/repair failures as hard failures, not soft warnings.
 
 Known gaps and constraints:
