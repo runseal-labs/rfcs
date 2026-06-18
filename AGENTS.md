@@ -41,6 +41,7 @@ Do not include private product names, internal repository names, private issue o
 ## Compatibility Stance
 
 - Treat the current implementation and current unaccepted drafts as greenfield until an accepted public compatibility RFC says otherwise.
+- Do not treat existing repository code, tests, fixtures, examples, drafts, or early releases as legacy behavior that must be preserved; this is a new implementation with no historical baggage.
 - There is no backward-compatibility obligation for earlier drafts, scaffold behavior, temporary field names, aliases, fixtures, audit shapes, CLI details, JSON-RPC details, or implementation details.
 - Prefer the correct public contract over compatibility with provisional behavior.
 - Do not specify adapters, compatibility shims, version gates, silent fallbacks, deprecated aliases, or migration paths unless an accepted RFC explicitly makes them part of the contract.
