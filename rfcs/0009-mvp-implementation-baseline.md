@@ -83,6 +83,7 @@ The RFC set reaches PRD-ready state when all of the following are true:
 - RFC-0007 defines threat model, platform matrix, Windows reference backend expectations, macOS experimental posture, Linux future/community posture, and fail-closed requirements.
 - RFC-0008 defines implementation phases, work packages, conformance tests, and technical-preview acceptance criteria.
 - RFC-0010 defines the RFC/implementation repository boundary, Windows reference extraction rules, redaction requirements, and conformance gates.
+- RFC-0011 defines the binary-safe `stdin.bytes` request encoding and audit boundary.
 - No RFC or README contains private/internal product references or transient chat artifacts.
 
 ## Remaining non-blockers
