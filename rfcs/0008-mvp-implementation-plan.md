@@ -4,6 +4,8 @@
 
 RunSeal should start with a Windows reference backend MVP that proves a stable agent execution contract: policy parsing, command execution, platform backend selection, structured event streaming, audit logging, and fail-closed sandbox enforcement.
 
+Windows is the reference backend and MVP security baseline. macOS remains a first-class planned backend but is not an equal launch blocker. Linux remains future/community.
+
 The MVP should not try to finish enterprise proxy governance, domain rules, macOS enterprise-grade enforcement, Linux isolation, cloud execution, or UI approval flows. Those remain future layers on top of the same policy and protocol model. macOS and Linux should be easy to contribute behind the same backend trait and conformance suite, but they are not technical-preview gates.
 
 ## Goals
@@ -26,6 +28,7 @@ The MVP should not try to finish enterprise proxy governance, domain rules, macO
 - No cross-platform GUI approval prompt.
 - No source references to private products, private issue trackers, internal repository names, or internal codenames.
 - No claim that macOS or Linux provide the same enterprise security baseline as the Windows reference backend during the MVP.
+- No requirement that macOS reach enterprise-baseline parity before the Windows MVP technical preview ships.
 
 ## Public API posture
 

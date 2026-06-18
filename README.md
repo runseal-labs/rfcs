@@ -2,9 +2,13 @@
 
 English | [简体中文](README.zh-CN.md)
 
-RunSeal is a reusable Codex-style sandbox layer for AI agents.
+RunSeal is for agent applications that need to run real local tools without giving the agent full control of the endpoint.
 
-It defines a stable policy protocol for OS-native sandboxing, with a Windows reference backend as the initial strong-security implementation. Agent frameworks get safe local command execution without Docker, cloud VMs, or heavyweight infrastructure, while enterprises get controlled proxy networking, credential isolation, and structured audit logs.
+Unlike VM or container sandboxes, RunSeal keeps execution close to the host OS so commands can use installed toolchains, workspace files, enterprise endpoint configuration, and local app integrations. Unlike raw shell execution, every command runs through a policy-governed boundary with filesystem restrictions, proxy-only networking, synthetic home/profile roots, cleanup, and structured audit events.
+
+The Windows reference backend is the MVP enterprise baseline.
+
+> **Embeddable local security runtime for endpoint AI agents.**
 
 macOS and Linux remain part of the cross-platform contract, but their backends are contribution tracks: macOS starts as an experimental local-development backend, and Linux is a future/community backend. A backend is promoted only when it passes the shared conformance suite and reports unsupported capabilities fail-closed.
 
@@ -20,6 +24,7 @@ RunSeal follows the Codex-style model:
 - **Approval/policy**: the governance layer that decides what can run automatically, what is denied, and what requires escalation.
 - **Execution**: a single command or tool run inside a seal.
 - **Controlled proxy**: the only network path for enterprise use, able to enforce routes, inject auth, redact data, and audit traffic.
+- **Host OS capability preserving**: keeps installed toolchains, workspace files, enterprise configuration, and local app integrations available inside the sandbox.
 
 
 ## Architecture flow
@@ -56,6 +61,7 @@ flowchart LR
 9. [RFC-0009: MVP implementation baseline](rfcs/0009-mvp-implementation-baseline.md)
 10. [RFC-0010: RFC/implementation boundary and Windows reference extraction](rfcs/0010-rfc-implementation-boundary-and-windows-reference-extraction.md)
 11. [RFC-0011: stdin bytes encoding](rfcs/0011-stdin-bytes-encoding.md)
+12. [RFC-0012: Windows single identity and global policy epoch model](rfcs/0012-windows-single-identity-and-global-policy-epoch.md)
 
 ## CLI vocabulary
 
@@ -76,6 +82,7 @@ The protocol method is `execute`; the returned domain object is an `Execution`, 
 - No direct secret injection into sandboxed processes.
 - No unmanaged direct network access as an enterprise default.
 - No claim that OS-native sandboxing prevents every kernel-level escape.
+- Not a generic sandbox CLI for manual developer use — built to be embedded by agent apps, IDEs, RPA platforms, and enterprise AI platforms.
 
 ## Reference signals
 

@@ -8,6 +8,8 @@
 
 RunSeal adopts a Codex-style sandbox model: local agent commands run inside OS-enforced boundaries, while policy decides what is allowed, denied, or escalated. RunSeal does not introduce a cloud VM platform or Docker dependency. It wraps platform-native isolation behind a stable protocol for AI agent frameworks.
 
+Unlike VM or container sandboxes, RunSeal keeps execution close to the host OS so commands can use installed toolchains, workspace files, and enterprise endpoint configuration.
+
 ## Motivation
 
 AI agents need to run local commands without unrestricted host access. A useful runtime must let routine work proceed autonomously while preserving a hard technical boundary around sensitive files, network access, process capabilities, and resource usage.
@@ -21,6 +23,7 @@ OpenAI Codex validates this product shape: sandboxing and approvals are separate
 - Prefer OS-native primitives over Docker, cloud VMs, or microVMs.
 - Make the default mode useful for local development: workspace write, controlled network, safe environment handling.
 - Keep policy explainable for users and auditable for enterprises.
+- Preserve host OS capability: installed toolchains, enterprise endpoint configuration, local app integrations, and workspace files remain available inside the sandbox boundary.
 
 ## Platform backend model
 
@@ -87,6 +90,17 @@ This avoids treating command classification as a substitute for isolation.
 - No default microVM runtime.
 - No promise of complete protection from kernel-level vulnerabilities.
 - No direct secret injection into sandboxed processes.
+
+## What RunSeal is and is not
+
+RunSeal is the reusable local execution boundary for agent apps.
+
+- It is **not** the agent.
+- It is **not** the model.
+- It is **not** the approval UI.
+- It is **not** the enterprise proxy product.
+
+It is the policy-governed runtime layer that lets an agent app safely execute local commands on endpoint machines.
 
 ## Decisions for MVP
 

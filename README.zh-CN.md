@@ -2,7 +2,13 @@
 
 [English](README.md) | 简体中文
 
-RunSeal 是一个面向 AI Agent 的本地执行沙箱层。它先用 Windows reference backend 证明强安全实现，把 OS-native sandbox 能力封装到稳定的 policy protocol 后面，让 Agent 框架可以安全地运行本地命令，同时让企业获得可控网络出口、凭据隔离和结构化审计日志。
+RunSeal 面向需要执行真实本地工具，同时不能把端点完全交给 Agent 控制的 Agent 应用。
+
+它不是 VM，也不是 Docker 替代品。它让 Agent 继续受益于 host OS 上已有的工具链、企业配置、本地应用和工作区文件，同时把每次本地命令执行收进可配置、可审计、可失败关闭的安全边界里，包含文件系统限制、仅代理出网、合成 home/profile 根目录、执行后清理和结构化审计事件。
+
+Windows reference backend 是企业端 MVP 基线。
+
+> **端侧 AI Agent 的可嵌入安全执行运行时。**
 
 macOS 和 Linux 仍属于同一套跨平台契约，但它们是开放贡献方向：macOS 先定位为 experimental local-development backend，Linux 保留为 future/community backend。任何后端只有通过共享 conformance suite，并且对未支持能力 fail-closed，才能升级为更强承诺。
 
@@ -18,6 +24,7 @@ RunSeal 关注四类边界：
 - **进程执行**：把一次命令或工具调用建模为可追踪的 `Execution`。
 - **网络访问**：支持禁用网络，或只允许通过 managed proxy 出网。
 - **审计事件**：记录执行生命周期、策略决策、拒绝原因、代理生命周期和最终结果。
+- **保留 host OS 能力**：已安装的工具链、工作区文件、企业配置和本地应用集成在沙箱边界内仍然可用。
 
 ## 核心设计
 
@@ -83,6 +90,7 @@ MVP 的重点是跑通：
 9. [RFC-0009：MVP implementation baseline](rfcs/0009-mvp-implementation-baseline.md)
 10. [RFC-0010：RFC/implementation boundary and Windows reference extraction](rfcs/0010-rfc-implementation-boundary-and-windows-reference-extraction.md)
 11. [RFC-0011：stdin bytes encoding](rfcs/0011-stdin-bytes-encoding.md)
+12. [RFC-0012：Windows single identity and global policy epoch model](rfcs/0012-windows-single-identity-and-global-policy-epoch.md)
 
 ## CLI 词汇
 
@@ -104,6 +112,7 @@ runseal exec --policy workspace-contained --network disabled -- python skill.py
 - 企业默认场景不允许非托管直连网络。
 - 不承诺 OS-native sandbox 可以防住所有 kernel-level escape。
 - MVP 不实现完整域名 allowlist / denylist 规则引擎。
+- 不是一个通用的 sandbox CLI——专为 Agent 应用、IDE、RPA 平台和企业 AI 平台嵌入而设计。
 
 ## 参考信号
 

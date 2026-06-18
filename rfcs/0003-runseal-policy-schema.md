@@ -13,7 +13,7 @@ RunSeal policies define what an execution may read, write, execute, connect to, 
 - Keep common policy portable across macOS, Linux, and Windows.
 - Make policy validation strict and fail-closed.
 - Separate stable cross-platform fields from backend-specific extensions.
-- Support enterprise audit by making the effective policy serializable and hashable.
+- Support enterprise audit by making the effective policy serializable and hashable. The policy hash MUST represent the full effective enforcement state, not only the user-supplied policy JSON.
 - Provide useful named profiles for agent runtimes.
 
 ## Top-level shape
@@ -170,8 +170,27 @@ Initial profile names:
 
 `network.mode` is selected independently as `disabled` or `proxy`. Profiles may provide defaults, but the schema keeps filesystem level and network mode as separate dimensions.
 
+## Effective policy hash
+
+The `policy_hash` MUST represent the effective policy, not only the user-supplied policy JSON. Two executions that share a policy hash MUST have identical enforcement behavior.
+
+The effective policy hash MUST incorporate:
+
+- Normalized sandbox level
+- Resolved cwd / workspace root
+- Canonical read, write, and deny roots
+- Protected subpaths
+- Network mode
+- Proxy route IDs (when mode=proxy)
+- Environment inherit, scrub, and set rules
+- Runtime root mode
+- Backend-required features
+- Policy schema version
+
+A backend MAY also include a backend setup generation identifier when enforcement state depends on out-of-band setup changes.
+
 ## Decisions for MVP
 
 - JSON is normative for v1. YAML may be accepted by the CLI as a convenience only after parsing into the same canonical JSON policy.
-- Policy inheritance/imports are post-MVP. MVP must materialize one effective policy object and policy hash before execution so permissions are never hidden.
+- Policy inheritance/imports are post-MVP. MVP must materialize one effective policy object and policy hash before execution so permissions are never hidden. The effective policy hash composition is defined in the "Effective policy hash" section above.
 - Package-manager cache access is represented as explicit `runtime.cacheRoots` / read-only roots in MVP, not a separate policy dimension. Built-in cache aliases can be added later once conformance tests cover them.

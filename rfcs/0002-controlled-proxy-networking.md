@@ -85,15 +85,24 @@ Sandboxed code receives placeholders or no credential at all. The proxy owns rea
 
 Injected headers are never visible to the sandbox as environment variables.
 
-## Proxy injection into sandbox
+## Proxy injection: routing hints, not enforcement boundary
 
-Typical implementation:
+Typical implementation sets environment variables:
 
 ```bash
 HTTP_PROXY=http://127.0.0.1:<session-port>
 HTTPS_PROXY=http://127.0.0.1:<session-port>
 NO_PROXY=
 ```
+
+Proxy environment variables are routing hints, not the enforcement boundary.
+
+The enforcement boundary is:
+
+- Direct-egress denial for sandboxed processes.
+- Permission to reach only the managed proxy endpoint.
+
+If the platform backend cannot block direct egress, `network.proxy` is unsupported and MUST fail closed.
 
 Where possible, platform backends should prevent bypassing the proxy by denying direct network namespaces/routes. Unix sockets, named pipes, or loopback-only listeners may be used as backend details.
 
@@ -135,3 +144,4 @@ Where possible, platform backends should prevent bypassing the proxy by denying 
 - RunSeal starts with a generic HTTP proxy guard. Database-specific MITM adapters are outside the MVP and belong in later plugins or enterprise extensions.
 - Response body inspection is not required for the open-source MVP. The core records metadata and denial events, while body inspection/redaction remains an extension point.
 - Organization-wide route composition is post-MVP. MVP policies reference route IDs and emit auditable policy hashes; later admin policy can constrain the allowed route set without changing the execution protocol.
+- If direct egress cannot be blocked by the platform backend, `network.proxy` MUST fail closed with `BACKEND_CAPABILITY_MISSING`. Setting proxy environment variables without direct-egress denial is not sufficient enforcement.

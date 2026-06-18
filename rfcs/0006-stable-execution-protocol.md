@@ -48,6 +48,27 @@ JSON-RPC gives simple request/response semantics and notifications for event str
 
 ## Core objects
 
+### Agent app global policy model
+
+RunSeal supports an app-level global sandbox policy mode. A host application typically sets one sandbox policy for all agent executions; it does not pass a different policy on every `execute` call.
+
+A backend MAY maintain one active effective policy cohort per sandbox identity. Concurrent executions are supported when they share the same active policy hash and policy epoch.
+
+Changing the global sandbox policy is a **policy epoch transition**:
+
+- A policy transition MUST occur only when there are no active sandboxed executions, or it MUST fail closed.
+- A backend MAY terminate old-epoch executions at transition time rather than blocking the transition.
+- Mixed effective-policy concurrency under the same sandbox identity is outside the MVP.
+
+**Design invariants:**
+
+1. A single sandbox identity has at most one active effective policy cohort at any time.
+2. All concurrent sandbox executions share the active `policy_hash` and `policy_epoch`.
+3. A policy transition MUST NOT modify SID-scoped or global enforcement state while old-epoch executions are still active.
+4. Global enforcement state MUST be refcounted or generation-bound.
+5. Execution cleanup is per-execution (job/process tree), not per sandbox user (no mass kill).
+6. Runtime roots, synthetic home, and temporary directories remain per-execution even when policy enforcement is shared.
+
 ### ExecutionRequest
 
 ```json
@@ -397,3 +418,4 @@ CLI output modes:
 - Event stream chunks use base64 in v1. Clients may render UTF-8 after decoding, but wire encoding stays unambiguous for binary-safe logs.
 - Sessions are implicit per execution for CLI/stdio MVP. `session_id` exists for audit and cleanup, while explicit `createSession` can be added later for long-lived daemon use cases.
 - MCP is a separate adapter over the stable protocol, not a first-class transport profile in v1. This keeps the core protocol small and avoids coupling RunSeal to one agent tool ecosystem.
+- Policy epoch transitions and the invariants in "Agent app global policy model" are MVP requirements for the Windows reference backend. macOS/Linux backends may adopt them as they mature.

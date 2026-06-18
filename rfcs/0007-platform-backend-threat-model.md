@@ -84,7 +84,9 @@ Windows is the MVP reference backend and the initial enterprise security baselin
 
 Required behavior:
 
-- Use one low-privilege sandbox identity/group model for sandboxed commands.
+- Use exactly one low-privilege sandbox identity for all sandboxed commands. Identity is not policy. Network mode, filesystem level, runtime roots, and proxy configuration are policy/enforcement state, not separate users or identity profiles.
+- RunSeal does not support dual-user (offline/online) sandbox identity schemas. Old dual-user setup artifacts from earlier prototypes MUST be detected and MUST cause setup to fail closed with a structured error; manual repair or reinstall is required.
+- Public API MUST NOT expose user count, SID, ACL, WFP rule names, token attributes, Job Object handles, or helper identity details.
 - Use ACLs and restricted process tokens to enforce read/write roots.
 - Platform plan previews may expose logical process boundary state such as restricted local process, low-privilege identity requirement, and process-tree cleanup requirement, but must not expose SIDs, token attributes, integrity levels, Job Object handles, helper identities, or host-specific profile names.
 - Redirect HOME, AppData, LocalAppData, Temp, and Tmp to the sandbox runtime root.
@@ -104,6 +106,24 @@ Known gaps and constraints:
 - Local toolchain compatibility depends on explicit read roots and cache roots.
 - Some developer tools may require additional runtime directories; these should be added through explicit policy expansion, not broad profile reads.
 - The backend does not defend against administrator-level tampering or kernel compromise.
+
+### OS-specific threat surfaces (out of MVP scope)
+
+The following Windows attack surfaces are recognized but outside the MVP enforcement boundary. Each is classified:
+
+| Surface | Classification |
+|---|---|
+| COM / DCOM / OLE automation | Denied by default; future backend capability |
+| Named pipes | Denied by default; future backend capability |
+| Windows Credential Manager / DPAPI | Out of scope; host app responsibility |
+| Browser profile and cookies | Out of scope; host app responsibility |
+| Clipboard / screen capture / accessibility APIs | Out of scope |
+| Windows Search / shell extensions | Out of scope |
+| PowerShell profile / module paths | Denied by default; runtime root redirect |
+| AppData roaming/local leakage | Protected via synthetic profile/AppData |
+| Corporate proxy / root CA / VPN assumptions | Host app responsibility |
+| Defender / EDR interaction | Compatible; not bypassed |
+| Scheduled task broker trust boundary | Out of scope |
 
 ## macOS backend model
 
@@ -154,6 +174,7 @@ The backend must refuse execution when:
 - Required ACL, token, firewall, WFP, Seatbelt, or path-translation setup fails.
 - A policy includes unknown mandatory fields.
 - A requested path cannot be safely normalized or represented in the backend plan.
+- Stale dual-user or split-identity setup artifacts are detected during backend initialization and cause a structured fail-closed error.
 
 Structured failures should include:
 
