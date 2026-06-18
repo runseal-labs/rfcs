@@ -99,6 +99,12 @@ Expected public crates or modules:
 
 The Windows backend may internally use Windows-specific primitives, but public APIs must not expose backend-private handles or policy knobs such as raw ACLs, SIDs, token attributes, firewall rule names, WFP callouts, internal helper identities, or host-specific profile names.
 
+## Windows backend identity boundary
+
+The Windows reference backend MUST present backend-private identity handling as a single internal sandbox identity at the RunSeal boundary. Public protocol, audit output, capability reports, and conformance fixtures MUST NOT expose account counts, local account names, SIDs, group names, or helper-specific identities.
+
+Windows setup, readiness checks, filesystem enforcement, restricted process setup, network guard/proxy setup, command-runner IPC, cleanup, and diagnostics MUST derive from that same internal sandbox identity. The implementation MUST NOT add compatibility readers, migrations, marker fields, or setup schemas for split sandbox identities unless a later accepted RFC explicitly changes the Windows identity model.
+
 ## Redaction requirements
 
 Before pushing public implementation work, contributors must check:
