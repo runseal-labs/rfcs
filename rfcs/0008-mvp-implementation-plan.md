@@ -2,19 +2,19 @@
 
 ## Summary
 
-RunSeal should start with a Windows + macOS MVP that proves a stable agent execution contract: policy parsing, command execution, platform backend selection, structured event streaming, audit logging, and fail-closed sandbox enforcement.
+RunSeal should start with a Windows reference backend MVP that proves a stable agent execution contract: policy parsing, command execution, platform backend selection, structured event streaming, audit logging, and fail-closed sandbox enforcement.
 
-The MVP should not try to finish enterprise proxy governance, domain rules, Linux isolation, cloud execution, or UI approval flows. Those remain future layers on top of the same policy and protocol model.
+The MVP should not try to finish enterprise proxy governance, domain rules, macOS enterprise-grade enforcement, Linux isolation, cloud execution, or UI approval flows. Those remain future layers on top of the same policy and protocol model. macOS and Linux should be easy to contribute behind the same backend trait and conformance suite, but they are not technical-preview gates.
 
 ## Goals
 
 1. Build a working `runseal` CLI and local protocol server skeleton.
-2. Implement Windows and macOS sandbox backends first.
-3. Keep Linux as a compile-time/backend abstraction placeholder.
+2. Implement the Windows sandbox backend first as the reference backend and enterprise security baseline.
+3. Keep macOS and Linux as compile-time/backend abstraction placeholders that can be completed through open-source contributions.
 4. Support the four filesystem sandbox levels and two network modes at the product-contract level.
 5. Ensure all user-submitted command execution paths use the same policy injection path.
 6. Produce structured audit events suitable for later enterprise integration.
-7. Provide conformance tests that let external agent frameworks validate behavior.
+7. Provide conformance tests that let external agent frameworks and backend contributors validate behavior.
 
 ## Non-goals
 
@@ -25,6 +25,7 @@ The MVP should not try to finish enterprise proxy governance, domain rules, Linu
 - No broad automatic toolchain discovery beyond the initial safe defaults and explicit allowlists.
 - No cross-platform GUI approval prompt.
 - No source references to private products, private issue trackers, internal repository names, or internal codenames.
+- No claim that macOS or Linux provide the same enterprise security baseline as the Windows reference backend during the MVP.
 
 ## Public API posture
 
@@ -74,6 +75,7 @@ Create a Rust workspace with these initial modules or crates:
 - `runseal-core`: protocol objects, policy model, execution state machine.
 - `runseal-policy`: policy parsing, normalization, and validation.
 - `runseal-backend`: platform backend trait and compiled plan model.
+- `runseal-backend-windows`: Windows reference backend implementation.
 - `runseal-audit`: JSONL audit event writer and redaction helpers.
 - `runseal-protocol`: JSON-RPC request/response and event schema.
 
@@ -128,10 +130,10 @@ trait SandboxBackend {
 Backend selection:
 
 - Windows: use the Windows sandbox backend for all non-`danger-full-access` executions.
-- macOS: use the Seatbelt backend for all non-`danger-full-access` executions.
+- macOS: return unsupported for sandboxed execution unless an experimental backend is explicitly built and reports support for the requested capability.
 - Linux: return unsupported for sandboxed execution in MVP; local execution only for explicit `danger-full-access`.
 
-### Phase 3: Windows MVP backend
+### Phase 3: Windows reference backend
 
 Implement enough Windows backend behavior to prove the policy contract:
 
@@ -153,9 +155,9 @@ Windows acceptance tests should cover:
 - direct network fails in `disabled`.
 - proxy mode cannot reach the network without the managed proxy path.
 
-### Phase 4: macOS MVP backend
+### Phase 4: macOS experimental backend contribution track
 
-Implement enough macOS backend behavior to prove the policy contract:
+Prepare a macOS backend skeleton and promotion criteria, without making macOS a technical-preview gate. A contributed macOS backend should prove each supported capability through the conformance suite before it is documented as supported.
 
 - Use `/usr/bin/sandbox-exec` by absolute path.
 - Generate Seatbelt profiles from the normalized policy.
@@ -166,8 +168,9 @@ Implement enough macOS backend behavior to prove the policy contract:
 - For `network.disabled`, omit network permissions.
 - For `network.proxy`, start a managed local HTTP proxy, inject proxy environment variables, and only allow the loopback proxy endpoint.
 - Stop proxy listeners and forwarding tasks when the command exits or is cancelled.
+- Report unsupported or degraded capabilities fail-closed instead of silently falling back to local execution.
 
-macOS acceptance tests should cover:
+macOS promotion tests should cover:
 
 - workspace write succeeds in `workspace-write`.
 - workspace-external write fails in `workspace-write`.
@@ -267,12 +270,12 @@ Recommended order for agent implementation:
 1. Build data models, CLI skeleton, and tests for parsing/validation.
 2. Implement local `danger-full-access` execution explicitly as the non-sandbox baseline.
 3. Add backend trait and capability reporting.
-4. Implement macOS Seatbelt backend enough for local development verification.
-5. Implement Windows backend enough for CI/manual verification on Windows.
+4. Implement Windows backend enough for CI/manual verification on Windows.
+5. Add macOS and Linux backend skeletons that report unsupported capabilities fail-closed.
 6. Add JSONL audit events for all execution paths.
 7. Add JSON-RPC stdio protocol and event subscription.
 8. Add managed proxy guard abstraction and proxy-only tests.
-9. Harden conformance tests and public docs.
+9. Harden conformance tests and public docs so future macOS/Linux backends can be promoted without changing the public protocol.
 
 ## Handoff expectations for coding agents
 
@@ -292,11 +295,11 @@ Each implementation task should report:
 
 The MVP is ready for public technical preview when:
 
-1. `runseal exec` can execute commands on Windows and macOS under at least `read-only`, `workspace-write`, and `danger-full-access`.
-2. `workspace-contained` exists in the policy model and has working first-pass enforcement on Windows and macOS.
-3. `network.disabled` is enforced on Windows and macOS.
+1. `runseal exec` can execute commands on Windows under at least `read-only`, `workspace-write`, and `danger-full-access`.
+2. `workspace-contained` exists in the policy model and has working first-pass enforcement on Windows.
+3. `network.disabled` is enforced on Windows.
 4. `network.proxy` has a managed proxy-only path or returns a fail-closed unsupported result.
 5. JSONL audit events are emitted for successful executions, denials, cancellations, and backend setup failures.
 6. JSON-RPC stdio supports execution lifecycle and event subscription.
-7. Conformance tests can distinguish supported, unsupported, denied, and failed states.
+7. Conformance tests can distinguish supported, unsupported, experimental, denied, and failed states.
 8. Public documentation contains no private/internal product references.

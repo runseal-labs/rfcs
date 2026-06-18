@@ -2,7 +2,9 @@
 
 [English](README.md) | 简体中文
 
-RunSeal 是一个面向 AI Agent 的本地执行沙箱层。它把 Windows、macOS 以及未来 Linux 上的 OS-native sandbox 能力封装到稳定的 policy protocol 后面，让 Agent 框架可以安全地运行本地命令，同时让企业获得可控网络出口、凭据隔离和结构化审计日志。
+RunSeal 是一个面向 AI Agent 的本地执行沙箱层。它先用 Windows reference backend 证明强安全实现，把 OS-native sandbox 能力封装到稳定的 policy protocol 后面，让 Agent 框架可以安全地运行本地命令，同时让企业获得可控网络出口、凭据隔离和结构化审计日志。
+
+macOS 和 Linux 仍属于同一套跨平台契约，但它们是开放贡献方向：macOS 先定位为 experimental local-development backend，Linux 保留为 future/community backend。任何后端只有通过共享 conformance suite，并且对未支持能力 fail-closed，才能升级为更强承诺。
 
 RunSeal 不定位为 VM 平台、Docker Desktop 替代品或云端多租户沙箱服务。它的目标是把本地 Agent 执行变成一种受策略约束、可审计、可集成的能力。
 
@@ -37,9 +39,9 @@ flowchart LR
   Protocol --> Policy[Policy engine]
   Policy --> Backend{Platform backend}
 
-  Backend --> Windows[Windows sandbox backend]
-  Backend --> MacOS[macOS Seatbelt backend]
-  Backend --> Linux[Linux backend future]
+  Backend --> Windows[Windows reference backend]
+  Backend --> MacOS[macOS experimental backend]
+  Backend --> Linux[Linux future/community backend]
 
   Windows --> Exec[Sandboxed execution]
   MacOS --> Exec
@@ -52,21 +54,21 @@ flowchart LR
 
 ## MVP 优先级
 
-当前 RFC 将 Windows 和 macOS 作为 MVP 一等平台：
+当前 RFC 将 Windows 作为 MVP reference backend 和企业强安全基线：
 
-- Windows：优先验证受限本地执行身份、文件 ACL、网络阻断和 proxy-only egress。
-- macOS：优先验证 `/usr/bin/sandbox-exec` / Seatbelt profile、受限读写根和 proxy-only egress。
-- Linux：先保留后端抽象入口，后续再映射到 bubblewrap / namespace / seccomp / cgroup。
+- Windows：优先验证受限本地执行身份、文件 ACL、网络阻断和 proxy-only egress，并作为标准的可运行证明。
+- macOS：作为 experimental backend 贡献方向，先验证 `/usr/bin/sandbox-exec` / Seatbelt profile 的本地开发可用性，不进入企业强安全基线。
+- Linux：先保留后端抽象入口，作为 future/community backend，后续再映射到 bubblewrap / namespace / seccomp / cgroup。
 
 MVP 的重点是跑通：
 
 1. `runseal exec` CLI。
 2. policy schema 解析和校验。
 3. 平台 backend trait 和能力报告。
-4. Windows / macOS 沙箱后端。
+4. Windows reference backend。
 5. JSON-RPC stdio 协议。
 6. JSONL audit 事件。
-7. conformance tests。
+7. conformance tests，用来推动 macOS / Linux 后端逐步升级。
 
 ## 初始 RFC
 
@@ -112,4 +114,4 @@ runseal exec --policy workspace-contained --network disabled -- python skill.py
 
 ## 状态
 
-MVP PRD-ready。当前 RFC 集已经给出 Windows 和 macOS 优先的可实现边界；Linux 保留为未来后端，继续复用同一协议抽象。
+MVP PRD-ready。当前 RFC 集已经给出 Windows-first 的可实现边界；Windows 是 reference backend 和企业安全基线，macOS / Linux 继续复用同一协议抽象，并通过开源贡献和 conformance evidence 逐步补足。

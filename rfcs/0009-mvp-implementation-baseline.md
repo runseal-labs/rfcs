@@ -8,7 +8,7 @@
 
 This RFC records the PRD-readiness review for the RunSeal RFC set. The goal is to make the repository implementation-ready for AI coding agents without relying on chat-only context or private implementation provenance.
 
-Conclusion: the RFC set is PRD-ready for a Windows + macOS MVP. The remaining unresolved items are intentionally marked as post-MVP extension points and do not block starting implementation.
+Conclusion: the RFC set is PRD-ready for a Windows-first MVP with Windows as the reference backend and enterprise security baseline. macOS is an experimental backend contribution track, and Linux remains a future/community backend behind the same protocol. The remaining unresolved items are intentionally marked as post-MVP extension points and do not block starting implementation.
 
 ## External evidence reviewed
 
@@ -30,20 +30,20 @@ The current direction is supported by public sources and comparable open-source 
 - Heel: native OS-level sandbox for LLM-generated code with macOS Seatbelt, Linux Landlock/seccomp, planned Windows AppContainer, network policies, and credential/home protection controls.
   - https://github.com/lexoliu/heel
 
-These sources support RunSeal's public positioning: a lightweight OS-native local sandbox layer with a stable protocol, policy/audit model, Windows and macOS first-class MVP support, and Linux deferred behind the same abstraction.
+These sources support RunSeal's public positioning: a lightweight OS-native local sandbox layer with a stable protocol, policy/audit model, a Windows reference backend for the MVP, and macOS/Linux backends that can be contributed and promoted through the same abstraction and conformance suite.
 
 ## Accepted MVP boundaries
 
 The following boundaries are accepted and implementation-ready:
 
 1. **Product scope**: RunSeal is a local OS-native execution sandbox layer for AI agents, not a hosted sandbox service, Docker replacement, VM platform, or cloud multi-tenant control plane.
-2. **Platform priority**: Windows and macOS are first-class MVP platforms. Linux remains a future backend behind the same abstraction.
+2. **Platform priority**: Windows is the first-class MVP reference backend and initial enterprise security baseline. macOS is experimental, and Linux remains a future/community backend behind the same abstraction.
 3. **Public policy model**: filesystem sandbox level and network mode are separate dimensions.
 4. **Sandbox levels**: `read-only`, `workspace-contained`, `workspace-write`, and `danger-full-access` are the MVP filesystem levels.
 5. **Network modes**: `disabled` and `proxy` are the MVP network modes. Unmanaged direct networking is outside the MVP policy surface.
 6. **Fail-closed posture**: unsupported or partially enforceable policies must return structured errors; the implementation must not silently fall back to unrestricted execution.
 7. **Windows backend target**: use restricted local execution identity plus OS policy controls such as ACLs, restricted tokens, Job Objects/AppContainer where available, and network restrictions/proxy-only egress.
-8. **macOS backend target**: use `/usr/bin/sandbox-exec` with generated Seatbelt profiles, safe dynamic path injection, canonical/raw path modeling, and proxy-only egress when network is enabled.
+8. **macOS backend target**: use `/usr/bin/sandbox-exec` with generated Seatbelt profiles, safe dynamic path injection, canonical/raw path modeling, and proxy-only egress when network is enabled, but treat macOS as experimental until conformance evidence proves each supported capability.
 9. **Linux posture**: do not implement Linux in MVP; return unsupported for sandboxed execution unless the request explicitly uses `danger-full-access` local execution.
 10. **Proxy posture**: MVP starts with a managed HTTP proxy guard and proxy lifecycle audit events. Domain/CIDR/method/path rules and body inspection are post-MVP extensions.
 11. **Secrets posture**: real credentials stay outside sandbox process environment. Credential injection belongs at the proxy boundary or future trusted host extensions.
@@ -63,11 +63,11 @@ The first coding pass can start without further product clarification:
 3. Implement `runseal exec`, `runseal capabilities`, and `runseal explain-policy` CLI shells.
 4. Implement the backend trait and capability reporting.
 5. Implement explicit local execution for `danger-full-access` as the non-sandbox baseline.
-6. Implement macOS Seatbelt backend for `read-only`, `workspace-write`, and a first-pass `workspace-contained`.
-7. Implement Windows backend scaffolding with fail-closed capability checks and the declared acceptance tests.
+6. Implement Windows backend scaffolding with fail-closed capability checks and the declared acceptance tests.
+7. Add macOS/Linux backend skeletons or contribution guides that report unsupported capabilities fail-closed.
 8. Implement JSONL audit writer and event schema alignment with RFC-0004.
 9. Implement JSON-RPC stdio methods from RFC-0006.
-10. Add conformance tests that distinguish supported, unsupported, denied, failed, and skipped states.
+10. Add conformance tests that distinguish supported, unsupported, experimental, denied, failed, and skipped states.
 
 ## Acceptance criteria for the RFC set
 
@@ -80,7 +80,7 @@ The RFC set reaches PRD-ready state when all of the following are true:
 - RFC-0004 defines event envelopes and MVP audit retention/output-body decisions.
 - RFC-0005 defines synthetic home, cache posture, and explicit real-home handling.
 - RFC-0006 defines JSON-RPC stdio MVP, error model, event streaming, and closed protocol decisions.
-- RFC-0007 defines threat model, platform matrix, Windows/macOS backend expectations, Linux deferral, and fail-closed requirements.
+- RFC-0007 defines threat model, platform matrix, Windows reference backend expectations, macOS experimental posture, Linux future/community posture, and fail-closed requirements.
 - RFC-0008 defines implementation phases, work packages, conformance tests, and technical-preview acceptance criteria.
 - No RFC or README contains private/internal product references or transient chat artifacts.
 
@@ -90,6 +90,7 @@ The following are intentionally not required before MVP coding begins:
 
 - Full enterprise route composition and organization-wide policy inheritance.
 - Response body inspection/redaction plugins.
+- macOS enterprise-baseline backend implementation.
 - Linux backend implementation.
 - VM/microVM/container daemon backends.
 - Interactive approval UI.
@@ -99,4 +100,4 @@ The following are intentionally not required before MVP coding begins:
 
 ## Review decision
 
-The RFC set is accepted as the MVP PRD baseline for implementation. Future changes should be filed as follow-up RFCs or amendments when they expand scope beyond the accepted MVP boundary.
+The RFC set is accepted as the Windows-first MVP PRD baseline for implementation. Future changes should be filed as follow-up RFCs or amendments when they expand scope beyond the accepted MVP boundary or promote a non-Windows backend based on conformance evidence.

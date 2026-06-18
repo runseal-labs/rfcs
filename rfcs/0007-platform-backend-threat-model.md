@@ -2,14 +2,14 @@
 
 ## Summary
 
-RunSeal prioritizes OS-native local sandboxing on Windows and macOS before adding Linux support. The product contract is platform-neutral, but each backend has different enforcement primitives and known gaps. This RFC defines the initial threat model, backend capability matrix, fail-closed requirements, and platform-specific MVP boundaries.
+RunSeal prioritizes OS-native local sandboxing with Windows as the initial reference backend and enterprise security baseline. The product contract is platform-neutral, but each backend has different enforcement primitives and known gaps. macOS starts as an experimental local-development backend, and Linux remains a future/community backend behind the same abstraction. This RFC defines the initial threat model, backend capability matrix, fail-closed requirements, and platform-specific MVP boundaries.
 
 The implementation should expose one stable policy model to clients. It must not leak Windows ACL/SID details, macOS Seatbelt profile details, or future Linux namespace details into public client APIs.
 
 ## Goals
 
-1. Treat Windows and macOS as first-class MVP platforms.
-2. Keep Linux as an explicit future backend behind the same abstraction.
+1. Treat Windows as the first-class MVP reference backend and strong-security baseline.
+2. Keep macOS and Linux behind the same backend abstraction, with macOS experimental and Linux future/community.
 3. Define what the sandbox is intended to prevent and what it does not claim to prevent.
 4. Require fail-closed behavior when a requested policy cannot be enforced.
 5. Align file-system and network policy semantics across platforms even when backend mechanisms differ.
@@ -21,6 +21,7 @@ The implementation should expose one stable policy model to clients. It must not
 - No transparent sandboxing of every helper process created by the host application.
 - No browser, keychain, credential vault, or desktop automation isolation guarantee beyond explicit file/network policy.
 - No domain allowlist or denylist enforcement in the first proxy iteration.
+- No claim that experimental or community backends provide the same enterprise security baseline as the Windows reference backend.
 
 ## Threat model
 
@@ -57,28 +58,28 @@ The public policy surface is shared across all platforms:
 
 `danger-full-access` is local execution. It does not claim filesystem or network hard boundaries.
 
-All other sandbox levels must use the platform backend when supported. If RunSeal cannot enforce the requested policy, it must fail closed with a structured error.
+All other sandbox levels must use the platform backend when supported. If RunSeal cannot enforce the requested policy, it must fail closed with a structured error. A backend may report an experimental or unsupported capability, but it must not silently present partial enforcement as strong sandboxing.
 
 ## Capability matrix
 
-| Capability | Windows MVP | macOS MVP | Linux future |
+| Capability | Windows reference MVP | macOS experimental | Linux future/community |
 | --- | --- | --- | --- |
-| Backend priority | First-class | First-class | Deferred |
-| Execution isolation | Restricted local process | Seatbelt-wrapped process | bubblewrap / namespaces |
-| `read-only` | No writes | No writes | Read-only binds |
-| `workspace-contained` | Workspace/runtime/toolchain/platform roots only | Workspace/runtime/toolchain/platform roots only | Explicit ro/rw binds |
-| `workspace-write` | Default readable surface, workspace/runtime writable | Default readable surface, workspace/runtime/temp writable | Default readable surface, workspace/runtime writable |
+| Backend priority | First-class / reference | Experimental contribution track | Deferred contribution track |
+| Execution isolation | Restricted local process | Seatbelt-wrapped process, capability-tested | bubblewrap / namespaces |
+| `read-only` | Required | Promotion target | Future |
+| `workspace-contained` | Required | Promotion target | Future |
+| `workspace-write` | Required | Promotion target | Future |
 | `danger-full-access` | Local execution | Local execution | Local execution |
-| Synthetic HOME/profile | Required | Required | Required |
-| Protected workspace metadata | Required | Required | Required |
-| Network `disabled` | Required | Required | Required |
-| Network `proxy` | Proxy-only egress required | Proxy-only egress required | Future |
+| Synthetic HOME/profile | Required | Promotion target | Future |
+| Protected workspace metadata | Required | Promotion target | Future |
+| Network `disabled` | Required | Capability-tested | Future |
+| Network `proxy` | Proxy-only egress required | Experimental / promotion target | Future |
 | Domain rules | Not MVP | Not MVP | Future |
 | Fail closed on setup failure | Required | Required | Required |
 
 ## Windows backend model
 
-Windows is an MVP platform. The implementation should use a restricted local execution identity and OS policy controls to enforce file and network boundaries.
+Windows is the MVP reference backend and the initial enterprise security baseline. The implementation should use a restricted local execution identity and OS policy controls to enforce file and network boundaries.
 
 Required behavior:
 
@@ -100,9 +101,9 @@ Known gaps and constraints:
 
 ## macOS backend model
 
-macOS is an MVP platform. The implementation should use `/usr/bin/sandbox-exec` with generated Seatbelt profiles and dynamic path parameters.
+macOS is an experimental local-development backend for the MVP, not the initial enterprise security baseline. The implementation may use `/usr/bin/sandbox-exec` with generated Seatbelt profiles and dynamic path parameters, but each supported capability must be proven through conformance tests before it is promoted beyond experimental status.
 
-Required behavior:
+Promotion requirements:
 
 - Use the fixed absolute path `/usr/bin/sandbox-exec`.
 - Generate a per-execution Seatbelt profile from the platform-neutral policy.
@@ -116,6 +117,7 @@ Required behavior:
 - Enforce `network.disabled` by omitting outbound network permissions.
 - Enforce `network.proxy` by starting a managed local HTTP proxy, injecting proxy environment variables, and only allowing the sandboxed process to reach that loopback proxy endpoint.
 - Bind proxy lifetime to the command/policy guard; when the command ends or is cancelled, proxy listeners and forwarding tasks must be stopped.
+- Report unsupported or degraded capabilities explicitly instead of treating Seatbelt coverage as equivalent to the Windows reference backend.
 
 Known gaps and constraints:
 
@@ -126,7 +128,7 @@ Known gaps and constraints:
 
 ## Linux future backend model
 
-Linux is intentionally deferred for the MVP, but the policy model should remain compatible with a later bubblewrap/namespace backend.
+Linux is intentionally deferred for the MVP and is expected to be filled through a future/community backend. The policy model should remain compatible with a later bubblewrap/namespace backend.
 
 Expected future mapping:
 
@@ -160,9 +162,9 @@ Hard policy denials should be terminal and non-retryable by default.
 
 ## Acceptance criteria
 
-1. Windows and macOS can report backend capabilities through the stable protocol.
-2. The same sandbox level and network mode produce the same product semantics on both platforms.
-3. Unsupported Linux sandbox execution returns a clear fail-closed result in the MVP.
+1. Windows can execute the MVP sandbox levels and network modes required for the reference backend.
+2. macOS and Linux can report backend capabilities through the stable protocol, including unsupported or experimental capability states.
+3. The same sandbox level and network mode produce the same product semantics only for capabilities a backend explicitly reports as supported.
 4. Proxy mode cannot silently fall back to unrestricted direct egress.
 5. `danger-full-access` is explicitly represented as local execution with no sandbox guarantee.
 6. Public docs and client APIs describe platform-neutral policy semantics instead of backend-private implementation knobs.
