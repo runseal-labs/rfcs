@@ -33,7 +33,8 @@ Do not include private product names, internal repository names, private issue o
 
 - Keep RFCs durable and implementation-neutral unless the RFC explicitly defines backend behavior.
 - Use normative language (`MUST`, `MUST NOT`, `SHOULD`, `MAY`) for stable protocol, policy, conformance, and fail-closed requirements.
-- Treat the MVP implementation as greenfield until a public compatibility policy is accepted. Prefer the correct contract over compatibility with earlier drafts, scaffold behavior, or temporary implementation details.
+- Treat the MVP implementation as greenfield until a public compatibility policy is accepted. There is no legacy compatibility obligation for earlier drafts, scaffold behavior, temporary field names, aliases, fixtures, or implementation details.
+- Prefer the correct public contract over compatibility with provisional behavior. Do not specify adapters, compatibility shims, silent fallbacks, or deprecated aliases unless an accepted RFC explicitly makes them part of the contract.
 - Keep Windows as the MVP reference backend and enterprise security baseline unless a later RFC changes that status.
 - Keep macOS experimental and Linux future/community until conformance evidence justifies promotion.
 - Public APIs must not expose backend-private controls such as ACLs, SIDs, token attributes, firewall rule names, WFP callouts, Seatbelt fragments, sandbox-exec flags, or namespace details.
