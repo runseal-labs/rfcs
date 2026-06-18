@@ -86,6 +86,7 @@ Required behavior:
 - Use one low-privilege sandbox identity/group model for sandboxed commands.
 - Use ACLs and restricted process tokens to enforce read/write roots.
 - Redirect HOME, AppData, LocalAppData, Temp, and Tmp to the sandbox runtime root.
+- Platform plan previews may expose logical runtime environment redirects such as HOME, USERPROFILE, APPDATA, LOCALAPPDATA, TEMP, TMP, RUNSEAL_HOME, and RUNSEAL_TMP, but must not expose backend-private identity, ACL, token, firewall, or helper details.
 - Protect the real user profile and common credential directories from sandboxed reads in `workspace-contained`.
 - Deny writes outside allowed roots in `read-only`, `workspace-contained`, and `workspace-write`.
 - Keep workspace metadata such as `.git`, `.agents`, and `.codex` non-writable by default.
