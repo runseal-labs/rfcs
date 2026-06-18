@@ -181,6 +181,8 @@ Returns backend and feature capabilities for the current host.
   "platform": "macos",
   "features": {
     "filesystem_policy": true,
+    "runtime_roots": true,
+    "runtime_environment": true,
     "process_isolation": true,
     "process_cleanup": true,
     "network_proxy": true,
