@@ -413,7 +413,7 @@ Maps to:
 CLI output modes:
 
 - default: passthrough stdout/stderr with concise final status
-- `--json`: emit final `ExecutionResult`
+- `--json`: emit final `ExecutionResult` on success, or a structured `error` object on failure
 - `--events`: emit JSONL event stream
 - `--explain`: call `explainPolicy` before execution
 
