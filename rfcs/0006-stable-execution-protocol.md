@@ -262,6 +262,10 @@ Response returns an `Execution` object. Output and audit events are streamed as 
 ### `cancelExecution`
 
 Requests cancellation. RunSeal should terminate the process tree and clean up the seal.
+The stdio MVP validates the method and returns `EXECUTION_NOT_FOUND` for unknown
+or already-finished executions. Cancelling an active execution requires a
+concurrent daemon transport such as a named pipe or Unix socket; that transport
+can be added later without changing the method shape.
 
 ```json
 {

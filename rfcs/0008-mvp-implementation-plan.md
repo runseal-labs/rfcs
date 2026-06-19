@@ -262,7 +262,7 @@ Minimum test categories:
 5. Environment inheritance and denylist behavior.
 6. Network disabled behavior.
 7. Proxy-only egress behavior.
-8. Cancellation behavior.
+8. Cancellation method validation; active cancellation is post-MVP daemon transport work.
 9. Structured audit event shape.
 10. JSON-RPC compatibility snapshots.
 11. Policy epoch immutability and same-policy cohort consistency.
@@ -309,7 +309,7 @@ The MVP is ready for public technical preview when:
 2. `workspace-contained` exists in the policy model and has working first-pass enforcement on Windows.
 3. `network.disabled` is enforced on Windows.
 4. `network.proxy` has a managed proxy-only path or returns a fail-closed unsupported result.
-5. JSONL audit events are emitted for successful executions, denials, cancellations, and backend setup failures.
+5. JSONL audit events are emitted for successful executions, denials, timeouts, and backend setup failures.
 6. JSON-RPC stdio supports execution lifecycle and event subscription.
 7. Conformance tests can distinguish supported, unsupported, experimental, denied, and failed states.
 8. Windows semantic freeze tests pass for single identity, policy epoch immutability, same-policy concurrency, mixed-policy rejection, per-execution runtime isolation, execution-scoped cleanup, and legacy dual-user setup rejection.
