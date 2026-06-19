@@ -67,6 +67,7 @@ RunSeal emits structured audit events for executions, policy decisions, sandbox 
 
 ### Network proxy
 
+- `execution.network.proxy_ready`
 - `execution.network.request`
 - `execution.network.denied`
 - `execution.network.auth_injected`

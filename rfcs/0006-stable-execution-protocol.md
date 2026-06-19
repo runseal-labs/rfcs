@@ -348,6 +348,7 @@ Important event types:
 - `sandbox.prepared`
 - `execution.network.request`
 - `execution.network.denied`
+- `execution.network.proxy_ready`
 - `execution.resource.limit_exceeded`
 
 Event schemas should align with RFC-0004.
