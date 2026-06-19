@@ -1,7 +1,7 @@
 # RFC-0012: Windows single identity and global policy epoch model
 
 - Status: Accepted for MVP
-- Created: 2026-06-20
+- Created: 2026-06-19
 - Project: RunSeal
 
 ## Summary
