@@ -100,7 +100,7 @@ Fields:
 - `env`: requested non-secret environment additions. Policy may scrub or deny entries.
 - `stdin`: stdin mode: `empty`, `inherit`, `bytes`, or `stream`. `bytes` payload encoding is defined by RFC-0011.
 - `timeout_ms`: optional request-level timeout.
-- `metadata`: client-provided opaque metadata copied into audit events after size limits.
+- `metadata`: client-provided opaque metadata copied into audit events after size limits and audit redaction rules.
 
 ### Execution
 
