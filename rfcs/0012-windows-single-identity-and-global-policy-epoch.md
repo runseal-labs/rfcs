@@ -23,8 +23,8 @@ The MVP adopts a single-identity model where identity is a setup concern and pol
 
 - **No dual offline/online sandbox users.** RunSeal uses exactly one private sandbox identity for all sandboxed commands.
 - **Identity is not policy.** Network mode, filesystem level, runtime roots, and proxy configuration are policy/enforcement state, not separate users or identity profiles.
-- **Policy changes are epoch transitions.** Per RFC-0006 §Agent app global policy model, changing the global sandbox policy requires a policy epoch transition. A transition must occur only when no active sandboxed executions exist, or it must fail closed.
-- **Mixed policy concurrency under the same sandbox identity is outside the MVP.** Concurrent executions are supported only when they share the same active policy hash and policy epoch.
+- **Global enforcement changes are epoch transitions.** Per RFC-0006 §Agent app global policy model, changing SID-scoped or global sandbox enforcement state requires a policy epoch transition. A transition must occur only when no active sandboxed executions exist, or it must fail closed.
+- **Mixed mutable-policy concurrency under the same sandbox identity is outside the MVP.** Concurrent executions are supported when they share the same active policy hash and policy epoch, or when the backend can prove the requested policies use the same already-installed global enforcement state and differ only in per-execution routing state.
 - **Same-policy concurrency requires refcounted or generation-bound global enforcement state.** Global enforcement resources (network guards, proxy listeners, filesystem ACLs) must be tied to the active policy epoch, not to individual executions.
 - **Runtime roots, synthetic home, and temporary directories remain per-execution** even when policy enforcement is shared across executions.
 - **Cleanup is per-execution (job/process tree), not per sandbox user.** No mass kill of all processes under the sandbox identity.
@@ -36,8 +36,8 @@ The MVP adopts a single-identity model where identity is a setup concern and pol
 
 The following invariants apply to all Windows MVP backends:
 
-1. A single sandbox identity has at most one active effective policy cohort at any time.
-2. All concurrent sandbox executions share the active `policy_hash` and `policy_epoch`.
+1. A single sandbox identity has at most one active mutable global enforcement cohort at any time.
+2. Concurrent sandbox executions either share the active `policy_hash` and `policy_epoch`, or use policies whose global enforcement state is equivalent and already installed.
 3. A policy transition MUST NOT modify SID-scoped or global enforcement state while old-epoch executions are still active.
 4. Global enforcement state MUST be refcounted or generation-bound.
 5. Execution cleanup is per-execution (job/process tree), not per sandbox user (no mass kill).
@@ -49,13 +49,13 @@ Before starting a sandboxed process, the Windows backend MUST:
 
 1. Normalize the requested policy into the effective enforcement state.
 2. Compute the effective `policy_hash`.
-3. Compare the requested `policy_hash` with the `policy_hash` bound to the active `policy_epoch` for the sandbox identity.
-4. If no sandboxed executions are active and the hash differs, create or activate a new `policy_epoch`.
-5. If sandboxed executions are active, require the requested hash to match the active epoch's `policy_hash`.
+3. Compare the requested global enforcement state with the state bound to the active `policy_epoch` for the sandbox identity.
+4. If no sandboxed executions are active and the global enforcement state differs, create or activate a new `policy_epoch`.
+5. If sandboxed executions are active, require the requested global enforcement state to match the active epoch, or prove that it is a backend-defined static equivalent that requires no global mutation.
 6. Create an `Execution` and bind it to the active `policy_hash` and `policy_epoch`.
 7. Increment the active execution count for that epoch before process start.
 
-If the requested `policy_hash` differs from the active epoch while sandboxed executions are active, the backend MUST reject the request fail-closed with `POLICY_TRANSITION_BUSY` or an equivalent structured error. It MUST NOT spawn the process and MUST NOT mutate global enforcement state.
+If the requested policy would require changing global enforcement state while sandboxed executions are active, the backend MUST reject the request fail-closed with `POLICY_TRANSITION_BUSY` or an equivalent structured error. It MUST NOT spawn the process and MUST NOT mutate global enforcement state.
 
 For a started execution, `policy_hash` and `policy_epoch` are immutable. Every execution-scoped audit event, JSON-RPC event notification, and final `ExecutionResult` MUST echo the same values.
 
@@ -69,6 +69,15 @@ The Windows backend MUST prevent one execution from reading or writing another e
 
 `network.disabled` MUST block direct egress at the OS enforcement boundary. `network.proxy` MUST allow only the managed proxy path and MUST block direct socket bypass. Unmanaged direct networking remains outside the MVP policy surface.
 
+A Windows backend MAY implement `network.disabled` and `network.proxy` with the same static OS-level network guard when:
+
+- direct non-proxy egress remains blocked for both modes;
+- the managed proxy endpoint is the only allowed local network path;
+- `network.disabled` executions receive no proxy routing environment; and
+- `network.proxy` access to the managed proxy endpoint is separately guarded, for example with execution-scoped proxy authentication as described in RFC-0002.
+
+In that design, switching between `disabled` and `proxy` does not by itself require firewall, WFP, or equivalent global enforcement mutation.
+
 ## Freeze gate requirements
 
 The implementation repository MUST include automated semantic tests, runnable on Windows locally and later in CI, for at least:
@@ -77,7 +86,7 @@ The implementation repository MUST include automated semantic tests, runnable on
 - Protocol and audit event shape, including `runseal_version`, `policy_hash`, and `policy_epoch`.
 - Execution immutability for `policy_hash` and `policy_epoch`.
 - Same-policy concurrency sharing one epoch.
-- Mixed-policy execution rejection while active executions exist.
+- Mixed-policy execution rejection while active executions exist, unless the backend proves the policies share an already-installed static global enforcement state.
 - Policy transition gating and post-drain epoch activation.
 - Per-execution runtime root, synthetic home, temp, and environment isolation.
 - Execution-scoped process cleanup without affecting unrelated executions.
