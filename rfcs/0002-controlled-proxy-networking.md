@@ -84,6 +84,9 @@ Sandboxed code receives placeholders or no credential at all. The proxy owns rea
 ```
 
 Injected headers are never visible to the sandbox as environment variables.
+The sandbox process receives only routing hints. Upstream enterprise tokens,
+service identities, and API keys are selected and injected by the proxy when it
+forwards an allowed request.
 
 ## Proxy injection: routing hints, not enforcement boundary
 
@@ -111,6 +114,14 @@ Where possible, platform backends should prevent bypassing the proxy by denying 
 The managed proxy endpoint itself MAY require an execution-scoped local proxy access credential, for example through the standard HTTP `Proxy-Authorization` mechanism derived from proxy URL userinfo.
 
 This local credential is not an upstream enterprise credential. It only authorizes access from the sandboxed execution to the local managed proxy endpoint. Real enterprise credentials still belong at the proxy boundary and MUST NOT be injected into the sandbox process environment.
+
+Backends SHOULD prefer header-only local proxy access credentials when a
+runner, adapter, or SDK path can reliably inject the proxy authorization header
+without exposing the credential through command arguments, logs, or inherited
+environment. Generic CLI compatibility MAY still require proxy URL userinfo
+because many standard tools discover proxy credentials only from `HTTP_PROXY` or
+`HTTPS_PROXY`. In that case, the userinfo credential remains a local proxy guard
+secret, not an upstream enterprise token, and all public outputs MUST redact it.
 
 When a backend uses a local proxy access credential:
 
