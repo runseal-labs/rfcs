@@ -414,7 +414,7 @@ CLI output modes:
 
 - default: passthrough stdout/stderr with concise final status
 - `--json`: emit final `ExecutionResult` on success, or a structured `error` object on failure
-- `--events`: emit JSONL event stream
+- `--events`: emit JSONL event stream on success, or one structured `error` object line on failure before the stream can complete
 - `--explain`: call `explainPolicy` before execution
 
 ## Compatibility rules
