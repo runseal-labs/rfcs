@@ -96,7 +96,20 @@ Enterprise default should be `proxy` or `disabled`; unmanaged `direct` networkin
 {
   "environment": {
     "inherit": "minimal",
-    "scrub": ["*_TOKEN", "*_KEY", "AWS_*", "OPENAI_API_KEY", "ANTHROPIC_API_KEY"],
+    "scrub": [
+      "*_TOKEN",
+      "*_KEY",
+      "*_SECRET",
+      "*_PASSWORD",
+      "*_AUTHORIZATION",
+      "*_COOKIE",
+      "AWS_*",
+      "OPENAI_API_KEY",
+      "ANTHROPIC_API_KEY",
+      "AUTHORIZATION",
+      "COOKIE",
+      "PASSWORD"
+    ],
     "set": {
       "CI": "1"
     },
@@ -106,6 +119,8 @@ Enterprise default should be `proxy` or `disabled`; unmanaged `direct` networkin
 ```
 
 Real enterprise credentials should not be injected into sandbox environment variables. They belong at the proxy boundary.
+
+The default scrub list MUST deny common credential variable shapes, including token, key, secret, password, authorization header, and cookie names. Implementations MAY add more deny patterns, but MUST NOT remove these defaults unless a policy explicitly replaces the scrub list.
 
 When `network.mode` is `proxy`, `environment.proxy` MUST be `true` so the managed proxy route is advertised to sandboxed tools. A policy MUST fail validation if it requests proxy networking while disabling proxy environment injection.
 
