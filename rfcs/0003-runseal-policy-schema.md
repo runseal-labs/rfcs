@@ -107,6 +107,8 @@ Enterprise default should be `proxy` or `disabled`; unmanaged `direct` networkin
 
 Real enterprise credentials should not be injected into sandbox environment variables. They belong at the proxy boundary.
 
+When `network.mode` is `proxy`, `environment.proxy` MUST be `true` so the managed proxy route is advertised to sandboxed tools. A policy MUST fail validation if it requests proxy networking while disabling proxy environment injection.
+
 ## Resource policy
 
 ```json
