@@ -60,7 +60,7 @@ flowchart LR
 8. [RFC-0008: MVP implementation plan](rfcs/0008-mvp-implementation-plan.md)
 9. [RFC-0009: MVP implementation baseline](rfcs/0009-mvp-implementation-baseline.md)
 10. [RFC-0010: RFC/implementation boundary and Windows reference extraction](rfcs/0010-rfc-implementation-boundary-and-windows-reference-extraction.md)
-11. [RFC-0011: stdin bytes encoding](rfcs/0011-stdin-bytes-encoding.md)
+11. [RFC-0011: stdin bytes and file input](rfcs/0011-stdin-bytes-encoding.md)
 12. [RFC-0012: Windows single identity and global policy epoch model](rfcs/0012-windows-single-identity-and-global-policy-epoch.md)
 
 ## CLI vocabulary
