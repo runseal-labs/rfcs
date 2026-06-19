@@ -100,6 +100,7 @@ Required behavior:
 - Platform plan previews may expose logical network guard state such as direct egress denial and managed proxy requirement, but must not expose firewall rule names, WFP callouts, helper identities, or endpoint secrets.
 - Platform plan previews may expose logical setup requirements such as runtime root preparation, runtime environment redirects, runtime cleanup, network guard setup, managed proxy setup, and fail-closed-on-setup-error state, but must not expose helper identities, rule names, handles, tokens, or backend-private helper paths.
 - Treat helper/setup/repair failures as hard failures, not soft warnings.
+- Setup readiness diagnostics MAY expose coarse public state such as platform support, whether setup is required, broker readiness, and whether the current process can repair setup. They MUST NOT expose scheduled task names, helper paths, account names, SIDs, ACLs, WFP/firewall details, token attributes, or backend-private profile paths.
 
 Known gaps and constraints:
 
