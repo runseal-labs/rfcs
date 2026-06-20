@@ -12,6 +12,27 @@ The CLI remains supported. Service mode adds a long-running local control plane 
 
 The first service-mode milestone MUST be local-only and SHOULD start with stdio or same-user local IPC. It MUST NOT expose a remote HTTP API, multi-user daemon surface, or network listener by default.
 
+## Operating mode stance
+
+RunSeal MUST NOT become daemon-only. Direct mode remains a first-class operating mode for CLI use, CI, debugging, bootstrap, and environments where no service is running.
+
+Service mode is the long-term stateful integration path. It is expected to evolve toward daemon-capable local operation, but daemon capability does not imply a default remote server, a network listener, a multi-user service, or a privileged system service.
+
+The intended long-term model is:
+
+```text
+direct mode
+  runseal exec ...
+  runseal rpc --stdio
+
+service mode
+  runseal service --stdio
+  runseal service --pipe / --socket
+  runseal --service exec ...
+```
+
+Implementations MUST preserve direct mode even after service mode becomes stable.
+
 ## Goals
 
 1. Add a local service control plane for long-lived RunSeal state.
@@ -358,4 +379,4 @@ A service-mode implementation is acceptable only when:
 
 ## Review decision
 
-Service mode is approved as a future direction after the execution layer is extracted. The first implementation should be local-only, stateful, and conservative. It should add service ownership for lifecycle and resources without changing public policy, audit, backend, or platform semantics.
+Service mode is approved as the long-term stateful integration direction after the execution layer is extracted. RunSeal is expected to become daemon-capable over time, but it MUST NOT become daemon-only. The first implementations should remain local-only, same-user, stateful, and conservative. They should add service ownership for lifecycle and resources without changing public policy, audit, backend, or platform semantics.
