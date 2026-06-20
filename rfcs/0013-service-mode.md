@@ -386,6 +386,33 @@ The response SHOULD include:
 }
 ```
 
+### `getAuditEvents`
+
+`getAuditEvents` returns service-known audit/event records for one execution. The MVP service MAY serve only events retained in the current service process; it MUST NOT accept arbitrary filesystem paths or read an untrusted `audit_path` from the request.
+
+Request parameters SHOULD be:
+
+```json
+{
+  "execution_id": "exec_01J...",
+  "types": ["execution.*", "policy.*"]
+}
+```
+
+`types` follows the same filtering semantics as `subscribeEvents`. Omitting `types` returns all retained events for that execution.
+
+The response SHOULD include:
+
+```json
+{
+  "execution_id": "exec_01J...",
+  "events": [],
+  "count": 0
+}
+```
+
+The response MUST preserve `AuditEvent` shape and MUST NOT include raw stdin, credential material, Authorization headers, cookies, backend-private details, or metadata payloads that were not already part of the public event stream.
+
 ## Security requirements
 
 Service mode MUST preserve these requirements:
