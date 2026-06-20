@@ -354,6 +354,38 @@ Allowed `mode` values are `direct` and `service`.
 Allowed `transport` values are `stdio`, `pipe`, `socket`, and `none`.
 `remote_listener` MUST be `false` unless a later RFC explicitly defines a remote-capable transport.
 
+### `listExecutions`
+
+`listExecutions` returns an in-memory summary of executions known to the current service process. Direct mode MAY return an empty list because it does not own cross-request service state.
+
+The response MUST remain public-safe and MUST NOT include stdout, stderr, raw stdin, metadata payloads, raw audit events, credential material, or backend-private platform details.
+
+The response SHOULD include:
+
+```json
+{
+  "executions": [
+    {
+      "execution_id": "exec_01J...",
+      "session_id": "sess_01J...",
+      "status": "finished",
+      "policy_id": "danger-full-access",
+      "policy_hash": "sha256:...",
+      "policy_epoch": "sha256:...",
+      "backend": {
+        "name": "runseal-windows-reference",
+        "status": "reference",
+        "platform": "windows"
+      },
+      "audit_path": ".runseal/audit/sess_01J.jsonl",
+      "started_at": "2026-06-14T00:00:00Z",
+      "finished_at": "2026-06-14T00:00:03Z"
+    }
+  ],
+  "count": 1
+}
+```
+
 ## Security requirements
 
 Service mode MUST preserve these requirements:
