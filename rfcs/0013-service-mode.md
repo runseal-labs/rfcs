@@ -134,6 +134,12 @@ subscribeEvents    streams matching events
 disposeSession     releases session resources
 ```
 
+If `cancelExecution` targets an execution that the service knows has already
+reached a terminal state, the service SHOULD return a structured
+`EXECUTION_NOT_CANCELLABLE` error instead of `EXECUTION_NOT_FOUND`. Direct mode
+MAY still return `EXECUTION_NOT_FOUND` because it does not own cross-request
+execution state.
+
 An `Execution` record should track at least:
 
 ```text
