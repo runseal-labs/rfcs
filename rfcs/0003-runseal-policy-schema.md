@@ -56,6 +56,8 @@ Rules:
 - Traversal components are rejected.
 - Broad write roots such as `/` or `$HOME` require explicit unsafe mode.
 - Deny rules override allow rules.
+- `filesystem.deny` is the portable way to name sensitive host paths that MUST NOT be readable by sandboxed executions, even when a broader read root would otherwise cover them. Typical entries include SSH keys, cloud credentials, package-manager credentials, and agent/runtime configuration directories.
+- Backends MAY add default credential/profile deny roots for known sensitive locations. These defaults MUST be included in the effective policy hash and SHOULD be reported by logical category rather than by resolved host path.
 - The effective path set is recorded in audit events.
 
 ## Process policy
