@@ -333,6 +333,27 @@ getPolicyEpoch
 
 New methods that change public protocol behavior require an RFC update.
 
+### `getServiceStatus`
+
+`getServiceStatus` reports the current local control-plane mode without starting setup, opening a listener, or mutating service state.
+
+The response MUST remain public-safe and SHOULD include:
+
+```json
+{
+  "status": "running",
+  "mode": "service",
+  "transport": "stdio",
+  "stateful": true,
+  "local_only": true,
+  "remote_listener": false
+}
+```
+
+Allowed `mode` values are `direct` and `service`.
+Allowed `transport` values are `stdio`, `pipe`, `socket`, and `none`.
+`remote_listener` MUST be `false` unless a later RFC explicitly defines a remote-capable transport.
+
 ## Security requirements
 
 Service mode MUST preserve these requirements:
