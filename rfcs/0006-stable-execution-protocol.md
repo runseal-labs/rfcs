@@ -366,6 +366,8 @@ Malformed JSON-RPC frames on stream transports MUST return a structured error wi
 
 JSON values that parse successfully but are not valid JSON-RPC request envelopes MUST return JSON-RPC error code `-32600` and `error.data.code: "INVALID_REQUEST"`.
 
+JSON-RPC batch requests are outside RunSeal v1. Array frames MUST return JSON-RPC error code `-32600` and `error.data.code: "INVALID_REQUEST"`.
+
 If `id` is present, it MUST be a string, number, or `null`. Invalid `id` values MUST be rejected as invalid request envelopes and the error response `id` MUST be `null`.
 
 Unknown JSON-RPC methods MUST return JSON-RPC error code `-32601` and `error.data.code: "METHOD_NOT_FOUND"`.
