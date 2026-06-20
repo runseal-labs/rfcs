@@ -120,7 +120,7 @@ audit handles or audit index cursors
 
 The service MAY create implicit sessions for CLI and stdio clients. Explicit session creation can be added later without changing the core `Execution` object.
 
-`disposeSession` MUST release session-scoped resources that are safe to release. It MUST NOT delete audit records that are already committed.
+`disposeSession` MUST release session-scoped resources that are safe to release. It MUST NOT delete audit records that are already committed, and it SHOULD NOT remove terminal execution summaries or retained audit/event query results from the service index.
 
 ## Executions
 
