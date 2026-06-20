@@ -378,6 +378,8 @@ Unexpected implementation failures MUST return JSON-RPC error code `-32603` and 
 
 RunSeal domain errors MUST use a JSON-RPC server error code. RunSeal v1 uses `-32000`; clients MUST classify RunSeal-specific failures by `error.data.code`.
 
+Execution-scoped domain errors that have allocated an `Execution` MUST include public execution binding fields in `error.data`: `execution_id`, `session_id`, `policy_id`, `policy_hash`, `policy_epoch`, and `backend`.
+
 ```json
 {
   "jsonrpc": "2.0",
