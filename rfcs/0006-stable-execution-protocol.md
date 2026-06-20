@@ -45,6 +45,7 @@ JSON-RPC gives simple request/response semantics and notifications for event str
 - IDs are opaque strings with stable prefixes: `exec_`, `sess_`, `seal_`, `pol_`.
 - Timestamps are RFC 3339 UTC strings.
 - Byte fields are integers, not human-readable strings.
+- Client-to-server requests without an `id` are JSON-RPC notifications. RunSeal v1 defines server-to-client event notifications only; client-to-server notifications MUST be ignored without a response and MUST NOT mutate execution state.
 
 ## Core objects
 
