@@ -376,12 +376,14 @@ Method parameter validation failures MUST return JSON-RPC error code `-32602` an
 
 Unexpected implementation failures MUST return JSON-RPC error code `-32603` and `error.data.code: "INTERNAL_ERROR"`.
 
+RunSeal domain errors MUST use a JSON-RPC server error code. RunSeal v1 uses `-32000`; clients MUST classify RunSeal-specific failures by `error.data.code`.
+
 ```json
 {
   "jsonrpc": "2.0",
   "id": 10,
   "error": {
-    "code": -32010,
+    "code": -32000,
     "message": "Policy denied execution",
     "data": {
       "code": "POLICY_DENIED",
