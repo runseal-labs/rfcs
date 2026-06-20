@@ -226,6 +226,29 @@ macOS/Linux: Unix domain socket
 
 The IPC transport MUST be local-only. It MUST authenticate or restrict access to the intended local user boundary. It MUST NOT expose a TCP listener by default.
 
+The minimum IPC security floor is:
+
+1. A same-user IPC transport MUST be enabled only when the platform can prove the peer is inside the intended local user or logon-session boundary.
+2. If the implementation cannot reliably authenticate the peer, the transport MUST fail closed and direct CLI or stdio service mode MUST remain the fallback.
+3. IPC authorization failure MUST happen before executing a request, mutating service state, allocating a managed proxy lease, or exposing execution/audit data.
+4. Transport diagnostics MUST use public RunSeal terminology and MUST NOT expose backend-private ACLs, SIDs, token attributes, socket inode details, runtime paths, or credential material.
+
+Windows named pipe requirements:
+
+1. The server MUST create the named pipe with an explicit security descriptor; it MUST NOT rely on the Windows default named pipe DACL.
+2. The DACL MUST restrict access to the service owner and intended logon-session boundary, and MUST reject remote network clients.
+3. The server MUST validate the connected client token before honoring a request, using impersonation/access-check behavior or an equivalent Windows peer-authentication primitive.
+4. Pipe creation MUST fail closed if the implementation cannot prevent a preexisting or less-restricted pipe instance from being used for RunSeal service traffic.
+
+macOS/Linux Unix domain socket requirements:
+
+1. The socket MUST live under a service-owned runtime directory that is not writable by other users.
+2. The implementation SHOULD set restrictive socket permissions where the platform honors them, but MUST NOT rely on socket file permissions as the only security boundary.
+3. The server MUST verify peer credentials with the platform's supported primitive, such as `SO_PEERCRED` on Linux or `getpeereid` / `LOCAL_PEERCRED` on macOS/BSD-derived systems.
+4. Linux abstract sockets MUST NOT be used as the portable default because their access cannot be constrained by filesystem permissions.
+
+A future TCP, HTTP, or browser-reachable local transport requires a separate RFC. That RFC must define authentication, request origin handling, CORS behavior, DNS rebinding defenses, CSRF defenses, listener binding, token storage, and audit-safe failure semantics.
+
 ### Phase 3: installable service
 
 An installable Windows service, launchd service, or systemd user service MAY be added later through a separate RFC.
@@ -301,6 +324,7 @@ Service mode MUST preserve these requirements:
 6. Service mode does not grant hidden privilege escalation.
 7. CLI direct mode remains available.
 8. Audit/event shape remains stable unless changed by a later RFC.
+9. Same-user IPC is not supported unless peer authentication is reliable on that platform.
 
 ## Implementation phases
 
@@ -330,6 +354,7 @@ A service-mode implementation is acceptable only when:
 8. Windows policy epoch tests still pass.
 9. Windows smoke still passes.
 10. No remote listener is exposed by default.
+11. Same-user IPC tests prove unauthorized peers and remote clients are rejected before any request is executed.
 
 ## Review decision
 
