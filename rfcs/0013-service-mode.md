@@ -413,6 +413,31 @@ The response SHOULD include:
 
 The response MUST preserve `AuditEvent` shape and MUST NOT include raw stdin, credential material, Authorization headers, cookies, backend-private details, or metadata payloads that were not already part of the public event stream.
 
+### `tailAudit`
+
+`tailAudit` returns retained audit/event records across executions known to the current service process. The MVP response is a snapshot, not a long-lived streaming subscription. Direct mode MAY return an empty list because it does not own cross-request service state.
+
+Request parameters SHOULD be:
+
+```json
+{
+  "types": ["execution.*", "policy.*"]
+}
+```
+
+`types` follows the same filtering semantics as `subscribeEvents`. Omitting `types` returns all retained events.
+
+The response SHOULD include:
+
+```json
+{
+  "events": [],
+  "count": 0
+}
+```
+
+The service MUST NOT accept arbitrary filesystem paths for `tailAudit`, and MUST NOT read untrusted `audit_path` input from the request. Persistent file tailing, cursors, follow mode, and pagination require a later RFC update.
+
 ## Security requirements
 
 Service mode MUST preserve these requirements:
