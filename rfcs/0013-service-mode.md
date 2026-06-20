@@ -364,6 +364,8 @@ Allowed `transport` values are `stdio`, `pipe`, `socket`, and `none`.
 
 `listExecutions` returns an in-memory summary of executions known to the current service process. Direct mode MAY return an empty list because it does not own cross-request service state.
 
+Service mode SHOULD return summaries in the order executions were recorded by the service. It SHOULD NOT sort summaries by `execution_id`, `session_id`, policy fields, or backend fields.
+
 The response MUST remain public-safe and MUST NOT include stdout, stderr, raw stdin, metadata payloads, raw audit events, credential material, or backend-private platform details.
 
 The response SHOULD include:
@@ -396,6 +398,8 @@ The response SHOULD include:
 
 `getAuditEvents` returns service-known audit/event records for one execution. The MVP service MAY serve only events retained in the current service process; it MUST NOT accept arbitrary filesystem paths or read an untrusted `audit_path` from the request.
 
+Events for one execution MUST preserve the original audit/event order recorded by the execution runtime.
+
 Request parameters SHOULD be:
 
 ```json
@@ -422,6 +426,8 @@ The response MUST preserve `AuditEvent` shape and MUST NOT include raw stdin, cr
 ### `tailAudit`
 
 `tailAudit` returns retained audit/event records across executions known to the current service process. The MVP response is a snapshot, not a long-lived streaming subscription. Direct mode MAY return an empty list because it does not own cross-request service state.
+
+The snapshot MUST preserve service record order across executions and original event order within each execution. It MUST NOT sort retained events by `execution_id`, `session_id`, policy fields, or backend fields.
 
 Request parameters SHOULD be:
 
