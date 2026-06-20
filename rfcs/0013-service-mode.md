@@ -159,6 +159,10 @@ exit status or structured failure
 
 The service MUST preserve existing audit and event semantics. Service state is an index and lifecycle owner, not a replacement for the audit event model.
 
+If an execution failure includes public setup readiness details, `getExecution`
+MUST preserve `setup_status` on the retained execution record. `listExecutions`
+MAY omit setup details from summaries.
+
 ## Event bus
 
 Service mode should provide a first-class event bus for execution lifecycle, policy decisions, backend setup failures, managed proxy activity, resource limits, cancellation, and final result events.
