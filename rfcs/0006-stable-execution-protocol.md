@@ -367,6 +367,8 @@ JSON values that parse successfully but are not valid JSON-RPC request envelopes
 
 Unknown JSON-RPC methods MUST return JSON-RPC error code `-32601` and `error.data.code: "METHOD_NOT_FOUND"`.
 
+Method parameter validation failures MUST return JSON-RPC error code `-32602` and a stable RunSeal code in `error.data.code`.
+
 ```json
 {
   "jsonrpc": "2.0",
