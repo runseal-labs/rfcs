@@ -91,6 +91,8 @@ MVP 的重点是跑通：
 10. [RFC-0010：RFC/implementation boundary and Windows reference extraction](rfcs/0010-rfc-implementation-boundary-and-windows-reference-extraction.md)
 11. [RFC-0011：stdin bytes encoding](rfcs/0011-stdin-bytes-encoding.md)
 12. [RFC-0012：Windows single identity and global policy epoch model](rfcs/0012-windows-single-identity-and-global-policy-epoch.md)
+13. [RFC-0013：RunSeal service mode](rfcs/0013-service-mode.md)
+14. [RFC-0014：Portable backend onboarding for macOS and Linux](rfcs/0014-portable-backend-onboarding.md)
 
 ## CLI 词汇
 
