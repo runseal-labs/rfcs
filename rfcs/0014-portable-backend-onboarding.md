@@ -224,6 +224,7 @@ Linux backends should probe runtime support for:
 
 ```text
 user namespace
+user namespace quota
 mount namespace
 PID namespace
 network namespace
