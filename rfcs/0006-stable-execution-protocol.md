@@ -363,6 +363,8 @@ JSON-RPC errors use stable RunSeal codes in `error.data.code`.
 
 Malformed JSON-RPC frames on stream transports MUST return a structured error with `id: null`, JSON-RPC error code `-32700`, and `error.data.code: "INVALID_REQUEST"`. A malformed frame MUST NOT terminate the stdio service loop or mutate execution state.
 
+Unknown JSON-RPC methods MUST return JSON-RPC error code `-32601` and `error.data.code: "METHOD_NOT_FOUND"`.
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -384,6 +386,7 @@ Initial stable error codes:
 | Code | Meaning |
 |---|---|
 | `INVALID_REQUEST` | Request payload is malformed or unsupported. |
+| `METHOD_NOT_FOUND` | JSON-RPC method is unknown. |
 | `POLICY_INVALID` | Policy failed validation. |
 | `POLICY_DENIED` | Policy denied the request. |
 | `POLICY_TRANSITION_BUSY` | A policy epoch transition or mixed-policy execution was rejected because sandboxed executions are still active. |
