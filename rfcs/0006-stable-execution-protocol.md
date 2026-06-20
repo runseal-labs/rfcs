@@ -361,7 +361,7 @@ Event schemas should align with RFC-0004.
 
 JSON-RPC errors use stable RunSeal codes in `error.data.code`.
 
-Malformed JSON-RPC frames on stream transports MUST return a structured error with `id: null` and `error.data.code: "INVALID_REQUEST"`. A malformed frame MUST NOT terminate the stdio service loop or mutate execution state.
+Malformed JSON-RPC frames on stream transports MUST return a structured error with `id: null`, JSON-RPC error code `-32700`, and `error.data.code: "INVALID_REQUEST"`. A malformed frame MUST NOT terminate the stdio service loop or mutate execution state.
 
 ```json
 {
