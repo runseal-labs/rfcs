@@ -86,6 +86,8 @@ The RFC set reaches PRD-ready state when all of the following are true:
 - RFC-0010 defines the RFC/implementation repository boundary, Windows reference extraction rules, redaction requirements, and conformance gates.
 - RFC-0011 defines the binary-safe `stdin.bytes` request encoding and audit boundary.
 - RFC-0012 defines the Windows single-identity model, global policy epoch invariants, and freeze-gate requirements.
+- RFC-0013 records the future optional local service-mode direction and explicitly keeps the MVP CLI/direct-execution path intact.
+- RFC-0014 records the future portable backend onboarding path for macOS and Linux, keeping Windows as the MVP reference baseline while requiring capability-driven, conformance-gated promotion for other platforms.
 - No RFC or README contains private/internal product references or transient chat artifacts.
 
 ## Remaining non-blockers
@@ -100,8 +102,9 @@ The following are intentionally not required before MVP coding begins:
 - Interactive approval UI.
 - MCP server implementation.
 - Complete automatic discovery of every package-manager cache and language runtime.
-- Long-lived explicit session APIs beyond implicit execution sessions.
+- Long-lived explicit session APIs beyond implicit execution sessions. RFC-0013 defines the follow-up service-mode direction, but service mode is not required before the Windows-first MVP implementation begins.
+- macOS and Linux capability-probe or enforcement implementations. RFC-0014 defines the follow-up portable backend onboarding direction, but non-Windows backend promotion remains gated on conformance evidence.
 
 ## Review decision
 
-The RFC set is accepted as the Windows-first MVP PRD baseline for implementation. Future changes should be filed as follow-up RFCs or amendments when they expand scope beyond the accepted MVP boundary or promote a non-Windows backend based on conformance evidence.
+The RFC set is accepted as the Windows-first MVP PRD baseline for implementation. RFC-0013 and RFC-0014 are included in the repository planning set as post-MVP/future-direction RFCs and do not block the Windows-first MVP implementation. Future changes should be filed as follow-up RFCs or amendments when they expand scope beyond the accepted MVP boundary, introduce service-mode public behavior, or promote a non-Windows backend based on conformance evidence.
