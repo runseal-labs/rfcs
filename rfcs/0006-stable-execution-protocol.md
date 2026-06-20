@@ -372,6 +372,8 @@ Unknown JSON-RPC methods MUST return JSON-RPC error code `-32601` and `error.dat
 
 Method parameter validation failures MUST return JSON-RPC error code `-32602` and a stable RunSeal code in `error.data.code`.
 
+Unexpected implementation failures MUST return JSON-RPC error code `-32603` and `error.data.code: "INTERNAL_ERROR"`.
+
 ```json
 {
   "jsonrpc": "2.0",
