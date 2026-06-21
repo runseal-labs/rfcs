@@ -4,7 +4,7 @@
 
 RunSeal should start with a Windows reference backend MVP that proves a stable agent execution contract: policy parsing, command execution, platform backend selection, structured event streaming, audit logging, and fail-closed sandbox enforcement.
 
-Windows is the reference backend and MVP security baseline. macOS remains a first-class planned backend but is not an equal launch blocker. Linux remains future/community.
+Windows is the reference backend and MVP security baseline. macOS remains a first-class planned backend but is not an equal launch blocker. Linux may promote individual capabilities experimentally without becoming part of the Windows enterprise baseline.
 
 The MVP should not try to finish enterprise proxy governance, domain rules, macOS enterprise-grade enforcement, Linux isolation, cloud execution, or UI approval flows. Those remain future layers on top of the same policy and protocol model. macOS and Linux should be easy to contribute behind the same backend trait and conformance suite, but they are not technical-preview gates.
 
@@ -135,7 +135,7 @@ Backend selection:
 
 - Windows: use the Windows sandbox backend for all non-`danger-full-access` executions.
 - macOS: return unsupported for sandboxed execution unless an experimental backend is explicitly built and reports support for the requested capability.
-- Linux: return unsupported for sandboxed execution in MVP; local execution only for explicit `danger-full-access`.
+- Linux: return unsupported for sandboxed execution unless the requested capability has conformance evidence; `read-only` with `network.disabled` may run experimentally when its runtime guard is available.
 
 ### Phase 3: Windows reference backend
 
@@ -282,10 +282,11 @@ Recommended order for agent implementation:
 3. Add backend trait and capability reporting.
 4. Implement Windows backend enough for CI/manual verification on Windows.
 5. Add macOS and Linux backend skeletons that report unsupported capabilities fail-closed.
-6. Add JSONL audit events for all execution paths.
-7. Add JSON-RPC stdio protocol and event subscription.
-8. Add managed proxy guard abstraction and proxy-only tests.
-9. Harden conformance tests and public docs so future macOS/Linux backends can be promoted without changing the public protocol.
+6. Promote Linux `read-only` with `network.disabled` experimentally when runtime probes and conformance tests prove enforcement.
+7. Add JSONL audit events for all execution paths.
+8. Add JSON-RPC stdio protocol and event subscription.
+9. Add managed proxy guard abstraction and proxy-only tests.
+10. Harden conformance tests and public docs so future macOS/Linux backends can be promoted without changing the public protocol.
 
 ## Handoff expectations for coding agents
 

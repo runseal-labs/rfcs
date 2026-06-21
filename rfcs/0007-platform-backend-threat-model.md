@@ -2,14 +2,14 @@
 
 ## Summary
 
-RunSeal prioritizes OS-native local sandboxing with Windows as the initial reference backend and enterprise security baseline. The product contract is platform-neutral, but each backend has different enforcement primitives and known gaps. macOS starts as an experimental local-development backend, and Linux remains a future/community backend behind the same abstraction. This RFC defines the initial threat model, backend capability matrix, fail-closed requirements, and platform-specific MVP boundaries.
+RunSeal prioritizes OS-native local sandboxing with Windows as the initial reference backend and enterprise security baseline. The product contract is platform-neutral, but each backend has different enforcement primitives and known gaps. macOS starts as an experimental local-development backend, and Linux may promote specific capabilities experimentally behind the same abstraction. This RFC defines the initial threat model, backend capability matrix, fail-closed requirements, and platform-specific MVP boundaries.
 
-The implementation should expose one stable policy model to clients. It must not leak Windows ACL/SID details, macOS Seatbelt profile details, or future Linux namespace details into public client APIs.
+The implementation should expose one stable policy model to clients. It must not leak Windows ACL/SID details, macOS Seatbelt profile details, or Linux namespace details into public client APIs.
 
 ## Goals
 
 1. Treat Windows as the first-class MVP reference backend and strong-security baseline.
-2. Keep macOS and Linux behind the same backend abstraction, with macOS experimental and Linux future/community.
+2. Keep macOS and Linux behind the same backend abstraction, with non-Windows capabilities promoted only through experimental, conformance-gated evidence.
 3. Define what the sandbox is intended to prevent and what it does not claim to prevent.
 4. Require fail-closed behavior when a requested policy cannot be enforced.
 5. Align file-system and network policy semantics across platforms even when backend mechanisms differ.
@@ -63,17 +63,17 @@ Sandboxed policies require explicit backend capability for filesystem policy, ru
 
 ## Capability matrix
 
-| Capability | Windows reference MVP | macOS experimental | Linux future/community |
+| Capability | Windows reference MVP | macOS experimental | Linux experimental/community |
 | --- | --- | --- | --- |
-| Backend priority | First-class / reference | Experimental contribution track | Deferred contribution track |
+| Backend priority | First-class / reference | Experimental contribution track | Experimental contribution track |
 | Execution isolation | Restricted local process | Seatbelt-wrapped process, capability-tested | bubblewrap / namespaces |
-| `read-only` | Required | Promotion target | Future |
+| `read-only` | Required | Promotion target | Experimental when runtime guard is available |
 | `workspace-contained` | Required | Promotion target | Future |
 | `workspace-write` | Required | Promotion target | Future |
 | `danger-full-access` | Local execution | Local execution | Local execution |
-| Synthetic HOME/profile | Required | Promotion target | Future |
+| Synthetic HOME/profile | Required | Promotion target | Experimental for `read-only` |
 | Protected workspace metadata | Required | Promotion target | Future |
-| Network `disabled` | Required | Capability-tested | Future |
+| Network `disabled` | Required | Capability-tested | Experimental for `read-only` |
 | Network `proxy` | Proxy-only egress required | Experimental / promotion target | Future |
 | Domain rules | Not MVP | Not MVP | Future |
 | Fail closed on setup failure | Required | Required | Required |
@@ -153,11 +153,11 @@ Known gaps and constraints:
 - Some tools require additional Seatbelt allowances for sysctl, Mach lookup, pty, IOKit, trustd/networkd, or language-runtime shared memory.
 - The backend does not claim to isolate Keychain, UI automation, accessibility APIs, or side channels.
 
-## Linux future backend model
+## Linux experimental backend model
 
-Linux is intentionally deferred for the MVP and is expected to be filled through a future/community backend. The policy model should remain compatible with a later bubblewrap/namespace backend.
+Linux is not part of the Windows enterprise security baseline. Individual Linux capabilities may be promoted experimentally when runtime probes and conformance tests prove enforcement on the current host. The initial Linux execution target is `read-only` with `network.disabled`; unsupported sandbox levels and network modes still fail closed.
 
-Expected future mapping:
+Expected mapping:
 
 - `readRoots` and `writeRoots` map to read-only and writable bind mounts.
 - Deny roots are omitted or shadowed with empty dirs/tmpfs where needed.
