@@ -88,6 +88,8 @@ The RFC set reaches PRD-ready state when all of the following are true:
 - RFC-0012 defines the Windows single-identity model, global policy epoch invariants, and freeze-gate requirements.
 - RFC-0013 records the future optional local service-mode direction and explicitly keeps the MVP CLI/direct-execution path intact.
 - RFC-0014 records the future portable backend onboarding path for macOS and Linux, keeping Windows as the MVP reference baseline while requiring capability-driven, conformance-gated promotion for other platforms.
+- RFC-0015 defines escape categories, severity levels, and adversarial conformance gates for backend capability promotion.
+- RFC-0016 defines the adversarial conformance case manifest, oracle model, result schema, and CI/release gate tiers.
 - No RFC or README contains private/internal product references or transient chat artifacts.
 
 ## Remaining non-blockers
@@ -107,4 +109,4 @@ The following are intentionally not required before MVP coding begins:
 
 ## Review decision
 
-The RFC set is accepted as the Windows-first MVP PRD baseline for implementation. RFC-0013 and RFC-0014 are included in the repository planning set as post-MVP/future-direction RFCs and do not block the Windows-first MVP implementation. Future changes should be filed as follow-up RFCs or amendments when they expand scope beyond the accepted MVP boundary, introduce service-mode public behavior, or promote a non-Windows backend based on conformance evidence.
+The RFC set is accepted as the Windows-first MVP PRD baseline for implementation. RFC-0013, RFC-0014, RFC-0015, and RFC-0016 are included in the repository planning set as post-MVP/future-direction RFCs and do not block the Windows-first MVP implementation. Future changes should be filed as follow-up RFCs or amendments when they expand scope beyond the accepted MVP boundary, introduce service-mode public behavior, add adversarial conformance requirements, define conformance harness behavior, or promote a non-Windows backend based on conformance evidence.

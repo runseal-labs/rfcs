@@ -93,6 +93,8 @@ MVP 的重点是跑通：
 12. [RFC-0012：Windows single identity and global policy epoch model](rfcs/0012-windows-single-identity-and-global-policy-epoch.md)
 13. [RFC-0013：RunSeal service mode](rfcs/0013-service-mode.md)
 14. [RFC-0014：Portable backend onboarding for macOS and Linux](rfcs/0014-portable-backend-onboarding.md)
+15. [RFC-0015：Escape definition and adversarial conformance model](rfcs/0015-escape-definition-and-adversarial-conformance.md)
+16. [RFC-0016：Adversarial conformance harness and case format](rfcs/0016-adversarial-conformance-harness-and-case-format.md)
 
 ## CLI 词汇
 
