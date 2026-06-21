@@ -10,7 +10,7 @@ The Windows reference backend is the MVP enterprise baseline.
 
 > **Embeddable local security runtime for endpoint AI agents.**
 
-macOS and Linux remain part of the cross-platform contract, but their backends are contribution tracks: macOS starts as an experimental local-development backend, and Linux is a future/community backend. A backend is promoted only when it passes the shared conformance suite and reports unsupported capabilities fail-closed.
+macOS and Linux remain part of the cross-platform contract, but their backends are contribution tracks: macOS starts as an experimental local-development backend, and Linux promotes individual capabilities experimentally. A backend capability is promoted only when it passes the shared conformance suite and reports unsupported requests fail-closed.
 
 RunSeal does **not** aim to be a VM platform, a Docker Desktop replacement, or a cloud multi-tenant sandbox service. It turns local agent execution into a policy-governed, auditable capability.
 
@@ -37,7 +37,7 @@ flowchart LR
 
   Backend --> Windows[Windows reference backend]
   Backend --> MacOS[macOS experimental backend]
-  Backend --> Linux[Linux future/community backend]
+  Backend --> Linux[Linux experimental/community backend]
 
   Windows --> Exec[Sandboxed execution]
   MacOS --> Exec

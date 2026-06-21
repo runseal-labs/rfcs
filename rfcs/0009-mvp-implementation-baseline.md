@@ -8,7 +8,7 @@
 
 This RFC records the PRD-readiness review for the RunSeal RFC set. The goal is to make the repository implementation-ready for AI coding agents without relying on chat-only context or private implementation provenance.
 
-Conclusion: the RFC set is PRD-ready for a Windows-first MVP with Windows as the reference backend and enterprise security baseline. macOS is an experimental backend contribution track, and Linux remains a future/community backend behind the same protocol. The remaining unresolved items are intentionally marked as post-MVP extension points and do not block starting implementation.
+Conclusion: the RFC set is PRD-ready for a Windows-first MVP with Windows as the reference backend and enterprise security baseline. macOS is an experimental backend contribution track, and Linux may promote individual capabilities experimentally behind the same protocol. The remaining unresolved items are intentionally marked as post-MVP extension points and do not block starting implementation.
 
 ## External evidence reviewed
 
@@ -37,7 +37,7 @@ These sources support RunSeal's public positioning: a lightweight OS-native loca
 The following boundaries are accepted and implementation-ready:
 
 1. **Product scope**: RunSeal is a local OS-native execution sandbox layer for AI agents, not a hosted sandbox service, Docker replacement, VM platform, or cloud multi-tenant control plane.
-2. **Platform priority**: Windows is the first-class MVP reference backend and initial enterprise security baseline. macOS is experimental, and Linux remains a future/community backend behind the same abstraction.
+2. **Platform priority**: Windows is the first-class MVP reference backend and initial enterprise security baseline. macOS is experimental, and Linux remains non-baseline while allowing conformance-gated experimental capability promotion.
 3. **Public policy model**: filesystem sandbox level and network mode are separate dimensions.
 4. **Sandbox levels**: `read-only`, `workspace-contained`, `workspace-write`, and `danger-full-access` are the MVP filesystem levels.
 5. **Network modes**: `disabled` and `proxy` are the MVP network modes. Unmanaged direct networking is outside the MVP policy surface.
@@ -45,7 +45,7 @@ The following boundaries are accepted and implementation-ready:
 7. **Windows backend target**: use restricted local execution identity plus OS policy controls such as ACLs, restricted tokens, Job Objects/AppContainer where available, and network restrictions/proxy-only egress.
 8. **Windows identity and epoch model**: Windows MVP uses one private sandbox identity, one active effective policy cohort, immutable per-execution `policy_hash`/`policy_epoch`, same-policy concurrency only, and fail-closed mixed-policy transitions.
 9. **macOS backend target**: use `/usr/bin/sandbox-exec` with generated Seatbelt profiles, safe dynamic path injection, canonical/raw path modeling, and proxy-only egress when network is enabled, but treat macOS as experimental until conformance evidence proves each supported capability.
-10. **Linux posture**: do not implement Linux in MVP; return unsupported for sandboxed execution unless the request explicitly uses `danger-full-access` local execution.
+10. **Linux posture**: Linux sandbox support is capability-driven and experimental; `read-only` with `network.disabled` may run when runtime probes and conformance tests prove enforcement, while unsupported sandboxed requests still fail closed.
 11. **Proxy posture**: MVP starts with a managed HTTP proxy guard and proxy lifecycle audit events. Domain/CIDR/method/path rules and body inspection are post-MVP extensions.
 12. **Secrets posture**: real credentials stay outside sandbox process environment. Credential injection belongs at the proxy boundary or future trusted host extensions.
 13. **Protocol shape**: JSON-RPC 2.0 over stdio is the MVP transport; Unix socket/named pipe/HTTP bridge can follow without changing method semantics.
@@ -81,7 +81,7 @@ The RFC set reaches PRD-ready state when all of the following are true:
 - RFC-0004 defines event envelopes and MVP audit retention/output-body decisions.
 - RFC-0005 defines synthetic home, cache posture, and explicit real-home handling.
 - RFC-0006 defines JSON-RPC stdio MVP, error model, event streaming, and closed protocol decisions.
-- RFC-0007 defines threat model, platform matrix, Windows reference backend expectations, macOS experimental posture, Linux future/community posture, and fail-closed requirements.
+- RFC-0007 defines threat model, platform matrix, Windows reference backend expectations, macOS experimental posture, Linux experimental capability posture, and fail-closed requirements.
 - RFC-0008 defines implementation phases, work packages, conformance tests, and technical-preview acceptance criteria.
 - RFC-0010 defines the RFC/implementation repository boundary, Windows reference extraction rules, redaction requirements, and conformance gates.
 - RFC-0011 defines the binary-safe `stdin.bytes` request encoding and audit boundary.
@@ -99,13 +99,13 @@ The following are intentionally not required before MVP coding begins:
 - Full enterprise route composition and organization-wide policy inheritance.
 - Response body inspection/redaction plugins.
 - macOS enterprise-baseline backend implementation.
-- Linux backend implementation.
+- Linux workspace-write/workspace-contained and proxy backend implementation.
 - VM/microVM/container daemon backends.
 - Interactive approval UI.
 - MCP server implementation.
 - Complete automatic discovery of every package-manager cache and language runtime.
 - Long-lived explicit session APIs beyond implicit execution sessions. RFC-0013 defines the follow-up service-mode direction, but service mode is not required before the Windows-first MVP implementation begins.
-- macOS and Linux capability-probe or enforcement implementations. RFC-0014 defines the follow-up portable backend onboarding direction, but non-Windows backend promotion remains gated on conformance evidence.
+- macOS enforcement and Linux capabilities beyond experimental `read-only` with `network.disabled`. RFC-0014 defines the follow-up portable backend onboarding direction, and non-Windows backend promotion remains gated on conformance evidence.
 
 ## Review decision
 

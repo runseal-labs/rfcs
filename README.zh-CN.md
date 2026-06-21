@@ -10,7 +10,7 @@ Windows reference backend 是企业端 MVP 基线。
 
 > **端侧 AI Agent 的可嵌入安全执行运行时。**
 
-macOS 和 Linux 仍属于同一套跨平台契约，但它们是开放贡献方向：macOS 先定位为 experimental local-development backend，Linux 保留为 future/community backend。任何后端只有通过共享 conformance suite，并且对未支持能力 fail-closed，才能升级为更强承诺。
+macOS 和 Linux 仍属于同一套跨平台契约，但它们是开放贡献方向：macOS 先定位为 experimental local-development backend，Linux 按单项 capability 实验性升级。任何后端能力只有通过共享 conformance suite，并且对未支持请求 fail-closed，才能升级为更强承诺。
 
 RunSeal 不定位为 VM 平台、Docker Desktop 替代品或云端多租户沙箱服务。它的目标是把本地 Agent 执行变成一种受策略约束、可审计、可集成的能力。
 
@@ -35,7 +35,7 @@ RunSeal 采用 Codex-style 的分层模型：
 - **Execution**：沙箱内的一次命令或工具运行，不把它等同于裸进程。
 - **Controlled proxy**：企业场景下的统一网络出口，用于路由控制、凭据注入、脱敏和审计。
 
-公开 API 保持平台无关：客户端只需要理解 `read-only`、`workspace-contained`、`workspace-write`、`danger-full-access` 等 sandbox level，以及 `disabled` / `proxy` 网络模式；不需要关心 Windows ACL、macOS Seatbelt profile 或未来 Linux namespace 的具体实现。
+公开 API 保持平台无关：客户端只需要理解 `read-only`、`workspace-contained`、`workspace-write`、`danger-full-access` 等 sandbox level，以及 `disabled` / `proxy` 网络模式；不需要关心 Windows ACL、macOS Seatbelt profile 或 Linux namespace 的具体实现。
 
 
 ## 架构流程
@@ -48,7 +48,7 @@ flowchart LR
 
   Backend --> Windows[Windows reference backend]
   Backend --> MacOS[macOS experimental backend]
-  Backend --> Linux[Linux future/community backend]
+  Backend --> Linux[Linux experimental/community backend]
 
   Windows --> Exec[Sandboxed execution]
   MacOS --> Exec
@@ -65,7 +65,7 @@ flowchart LR
 
 - Windows：优先验证受限本地执行身份、文件 ACL、网络阻断和 proxy-only egress，并作为标准的可运行证明。
 - macOS：作为 experimental backend 贡献方向，先验证 `/usr/bin/sandbox-exec` / Seatbelt profile 的本地开发可用性，不进入企业强安全基线。
-- Linux：先保留后端抽象入口，作为 future/community backend，后续再映射到 bubblewrap / namespace / seccomp / cgroup。
+- Linux：按 runtime probe 和 conformance evidence 实验性升级单项能力；当前方向先覆盖 `read-only` + `network.disabled`，其他 sandbox level 仍 fail-closed。
 
 MVP 的重点是跑通：
 
