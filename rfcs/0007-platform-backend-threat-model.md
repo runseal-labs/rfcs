@@ -68,7 +68,7 @@ Sandboxed policies require explicit backend capability for filesystem policy, ru
 | Backend priority | First-class / reference | Experimental contribution track | Experimental contribution track |
 | Execution isolation | Restricted local process | Seatbelt-wrapped process, capability-tested | bubblewrap / namespaces |
 | `read-only` | Required | Experimental when runtime guard is available | Experimental when runtime guard is available |
-| `workspace-contained` | Required | Promotion target | Future |
+| `workspace-contained` | Required | Promotion target | Experimental when runtime guard is available and network is disabled |
 | `workspace-write` | Required | Experimental when runtime guard is available and network is disabled | Experimental when runtime guard is available and network is disabled |
 | `danger-full-access` | Local execution | Local execution | Local execution |
 | Synthetic HOME/profile | Required | Experimental for `read-only` and `workspace-write` | Experimental for `read-only` and `workspace-write` |
