@@ -76,7 +76,7 @@ Changing the global sandbox policy is a **policy epoch transition**:
 
 ```json
 {
-  "command": ["pnpm", "test"],
+  "command": ["./node_modules/.bin/pnpm", "test"],
   "cwd": "/workspace",
   "policy": "workspace-write-proxy",
   "env": {
@@ -95,7 +95,7 @@ Changing the global sandbox policy is a **policy epoch transition**:
 
 Fields:
 
-- `command`: argv array. Shell strings are allowed only through explicit shell mode in a future extension.
+- `command`: argv array. `command[0]` MUST be path-qualified: absolute, or relative with at least one path separator such as `./tool` or `tools/tool`. RunSeal MUST NOT resolve bare program names through `PATH` or the current directory. Shell strings are allowed only through explicit shell mode in a future extension.
 - `cwd`: requested working directory, resolved against policy.
 - `policy`: named policy ID or inline policy object.
 - `env`: requested non-secret environment additions. Policy may scrub or deny entries.
@@ -251,7 +251,7 @@ Starts an execution.
   "id": 10,
   "method": "execute",
   "params": {
-    "command": ["python", "skill.py"],
+    "command": ["/usr/bin/python3", "skill.py"],
     "cwd": "/workspace",
     "policy": "workspace-write-proxy"
   }
@@ -429,7 +429,7 @@ Maps to:
 {
   "method": "execute",
   "params": {
-    "command": ["python", "skill.py"],
+    "command": ["/usr/bin/python3", "skill.py"],
     "policy": "workspace-write-proxy"
   }
 }
