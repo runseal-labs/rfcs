@@ -261,17 +261,18 @@ isolated temp root
 process cleanup
 ```
 
-### Linux phase 3: workspace-write and workspace-contained
+### Linux phase 3: workspace-write experimental
 
-These capabilities may be claimed only after conformance tests prove:
+`workspace-write` with `network.disabled` may become experimental after conformance tests prove:
 
 ```text
 workspace-write allows approved workspace writes
 workspace-write denies external writes
-workspace-contained denies external reads
 runtime roots are per execution
 protected subpaths remain protected
 ```
+
+`workspace-contained` remains unsupported until conformance tests prove external reads are denied without relying on broad host reads.
 
 ### Linux phase 4: Landlock augmentation
 

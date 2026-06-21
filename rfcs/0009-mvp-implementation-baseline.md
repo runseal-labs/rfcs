@@ -45,7 +45,7 @@ The following boundaries are accepted and implementation-ready:
 7. **Windows backend target**: use restricted local execution identity plus OS policy controls such as ACLs, restricted tokens, Job Objects/AppContainer where available, and network restrictions/proxy-only egress.
 8. **Windows identity and epoch model**: Windows MVP uses one private sandbox identity, one active effective policy cohort, immutable per-execution `policy_hash`/`policy_epoch`, same-policy concurrency only, and fail-closed mixed-policy transitions.
 9. **macOS backend target**: use `/usr/bin/sandbox-exec` with generated Seatbelt profiles, safe dynamic path injection, canonical/raw path modeling, and proxy-only egress when network is enabled, but treat macOS as experimental until conformance evidence proves each supported capability.
-10. **Linux posture**: Linux sandbox support is capability-driven and experimental; `read-only` with `network.disabled` may run when runtime probes and conformance tests prove enforcement, while unsupported sandboxed requests still fail closed.
+10. **Linux posture**: Linux sandbox support is capability-driven and experimental; `read-only` and `workspace-write` with `network.disabled` may run when runtime probes and conformance tests prove enforcement, while unsupported sandboxed requests still fail closed.
 11. **Proxy posture**: MVP starts with a managed HTTP proxy guard and proxy lifecycle audit events. Domain/CIDR/method/path rules and body inspection are post-MVP extensions.
 12. **Secrets posture**: real credentials stay outside sandbox process environment. Credential injection belongs at the proxy boundary or future trusted host extensions.
 13. **Protocol shape**: JSON-RPC 2.0 over stdio is the MVP transport; Unix socket/named pipe/HTTP bridge can follow without changing method semantics.
@@ -99,13 +99,13 @@ The following are intentionally not required before MVP coding begins:
 - Full enterprise route composition and organization-wide policy inheritance.
 - Response body inspection/redaction plugins.
 - macOS enterprise-baseline backend implementation.
-- Linux workspace-write/workspace-contained and proxy backend implementation.
+- Linux workspace-contained and proxy backend implementation.
 - VM/microVM/container daemon backends.
 - Interactive approval UI.
 - MCP server implementation.
 - Complete automatic discovery of every package-manager cache and language runtime.
 - Long-lived explicit session APIs beyond implicit execution sessions. RFC-0013 defines the follow-up service-mode direction, but service mode is not required before the Windows-first MVP implementation begins.
-- macOS enforcement and Linux capabilities beyond experimental `read-only` with `network.disabled`. RFC-0014 defines the follow-up portable backend onboarding direction, and non-Windows backend promotion remains gated on conformance evidence.
+- macOS enforcement and Linux capabilities beyond experimental `read-only` and `workspace-write` with `network.disabled`. RFC-0014 defines the follow-up portable backend onboarding direction, and non-Windows backend promotion remains gated on conformance evidence.
 
 ## Review decision
 
