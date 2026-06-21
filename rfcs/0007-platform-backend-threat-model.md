@@ -69,7 +69,7 @@ Sandboxed policies require explicit backend capability for filesystem policy, ru
 | Execution isolation | Restricted local process | Seatbelt-wrapped process, capability-tested | bubblewrap / namespaces |
 | `read-only` | Required | Promotion target | Experimental when runtime guard is available |
 | `workspace-contained` | Required | Promotion target | Future |
-| `workspace-write` | Required | Promotion target | Future |
+| `workspace-write` | Required | Promotion target | Experimental when runtime guard is available and network is disabled |
 | `danger-full-access` | Local execution | Local execution | Local execution |
 | Synthetic HOME/profile | Required | Promotion target | Experimental for `read-only` |
 | Protected workspace metadata | Required | Promotion target | Future |
@@ -155,7 +155,7 @@ Known gaps and constraints:
 
 ## Linux experimental backend model
 
-Linux is not part of the Windows enterprise security baseline. Individual Linux capabilities may be promoted experimentally when runtime probes and conformance tests prove enforcement on the current host. The initial Linux execution target is `read-only` with `network.disabled`; unsupported sandbox levels and network modes still fail closed.
+Linux is not part of the Windows enterprise security baseline. Individual Linux capabilities may be promoted experimentally when runtime probes and conformance tests prove enforcement on the current host. The initial Linux execution targets are `read-only` and `workspace-write` with `network.disabled`; unsupported sandbox levels and network modes still fail closed.
 
 Expected mapping:
 
