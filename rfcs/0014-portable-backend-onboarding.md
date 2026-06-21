@@ -238,6 +238,11 @@ unprivileged namespace availability
 
 The probe should produce public-safe diagnostics. The probe alone does not promote sandbox execution support.
 
+Probe entries may include optional public-safe `details` when a mechanism needs
+version-gated follow-up decisions, such as a Linux Landlock ABI version. These
+details remain diagnostic-only and MUST NOT expose backend-private handles,
+paths, descriptors, or command lines.
+
 ## Linux phases
 
 ### Linux phase 0: runtime probe only
