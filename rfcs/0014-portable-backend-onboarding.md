@@ -273,7 +273,7 @@ runtime roots are per execution
 protected subpaths remain protected
 ```
 
-`workspace-contained` remains unsupported until conformance tests prove external reads are denied without relying on broad host reads.
+`workspace-contained` with `network.disabled` may become experimental after conformance tests prove external reads are denied without relying on broad host reads.
 
 ### Linux phase 4: Landlock augmentation
 
