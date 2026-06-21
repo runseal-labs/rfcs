@@ -484,19 +484,25 @@ Recommended implementation sequence:
 
 ## Acceptance criteria
 
-A service-mode implementation is acceptable only when:
+A Phase 1 stdio service-mode implementation is acceptable only when:
 
 1. Existing CLI and protocol contract tests still pass.
 2. Service-backed `execute` emits the same event and audit shapes as direct execution.
-3. `getExecution` returns correct state for active and completed executions.
-4. `cancelExecution` either cancels an active execution or returns a stable not-found / not-cancellable result.
+3. `getExecution` returns correct state for completed executions and stable not-found results for unknown executions.
+4. `cancelExecution` returns a stable not-found or not-cancellable result for executions that cannot be cancelled through the current transport.
 5. `subscribeEvents` streams existing event shapes.
 6. `disposeSession` releases service-owned resources without deleting committed audit records.
 7. Unsupported requests remain fail-closed.
 8. Windows policy epoch tests still pass.
 9. Windows smoke still passes.
 10. No remote listener is exposed by default.
-11. Same-user IPC tests prove unauthorized peers and remote clients are rejected before any request is executed.
+11. Same-user IPC transports remain unimplemented or fail closed.
+
+Before a Phase 2 same-user IPC service is acceptable:
+
+1. `getExecution` returns correct state for active executions.
+2. `cancelExecution` cancels active executions when the backend supports cancellation, or returns a stable not-cancellable result.
+3. Same-user IPC tests prove unauthorized peers and remote clients are rejected before any request is executed.
 
 ## Review decision
 
