@@ -69,11 +69,11 @@ Sandboxed policies require explicit backend capability for filesystem policy, ru
 | Execution isolation | Restricted local process | Seatbelt-wrapped process, capability-tested | bubblewrap / namespaces |
 | `read-only` | Required | Experimental when runtime guard is available | Experimental when runtime guard is available |
 | `workspace-contained` | Required | Promotion target | Future |
-| `workspace-write` | Required | Promotion target | Experimental when runtime guard is available and network is disabled |
+| `workspace-write` | Required | Experimental when runtime guard is available and network is disabled | Experimental when runtime guard is available and network is disabled |
 | `danger-full-access` | Local execution | Local execution | Local execution |
-| Synthetic HOME/profile | Required | Experimental for `read-only` | Experimental for `read-only` |
-| Protected workspace metadata | Required | Promotion target | Future |
-| Network `disabled` | Required | Experimental for `read-only` | Experimental for `read-only` |
+| Synthetic HOME/profile | Required | Experimental for `read-only` and `workspace-write` | Experimental for `read-only` and `workspace-write` |
+| Protected workspace metadata | Required | Experimental for `workspace-write` | Future |
+| Network `disabled` | Required | Experimental for `read-only` and `workspace-write` | Experimental for `read-only` and `workspace-write` |
 | Network `proxy` | Proxy-only egress required | Experimental / promotion target | Future |
 | Domain rules | Not MVP | Not MVP | Future |
 | Fail closed on setup failure | Required | Required | Required |

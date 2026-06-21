@@ -138,7 +138,7 @@ Backends MAY maintain private compiled plans internally, but those details must 
 
 ## macOS backend strategy
 
-macOS remains an experimental local-development backend. `read-only` with `network.disabled` may run experimentally when the runtime guard is available; other sandbox levels and network modes still fail closed until conformance evidence promotes them.
+macOS remains an experimental local-development backend. `read-only` and `workspace-write` with `network.disabled` may run experimentally when the runtime guard is available; other sandbox levels and network modes still fail closed until conformance evidence promotes them.
 
 A future implementation may use a structure like:
 
@@ -183,16 +183,17 @@ unsupported network modes fail closed
 
 ### macOS phase 3: workspace-write and workspace-contained
 
-These capabilities may be claimed only after tests prove:
+`workspace-write` may be reported experimental after tests prove:
 
 ```text
 workspace writes are limited to approved roots
 external writes are denied
-workspace-contained denies external reads
 synthetic home and profile roots are isolated
 temp roots are isolated
 protected subpaths remain protected
 ```
+
+`workspace-contained` may be claimed only after tests also prove external reads are denied.
 
 ### macOS phase 4: network
 
