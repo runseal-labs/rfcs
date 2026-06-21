@@ -138,7 +138,7 @@ Backends MAY maintain private compiled plans internally, but those details must 
 
 ## macOS backend strategy
 
-macOS remains an experimental local-development backend until conformance evidence promotes individual capabilities.
+macOS remains an experimental local-development backend. `read-only` with `network.disabled` may run experimentally when the runtime guard is available; other sandbox levels and network modes still fail closed until conformance evidence promotes them.
 
 A future implementation may use a structure like:
 
@@ -171,7 +171,7 @@ Plan preview must remain platform-neutral and must not expose private profile fr
 
 ### macOS phase 2: read-only experimental execution
 
-Read-only execution may become experimental only after tests prove:
+Read-only execution may be reported experimental after tests prove:
 
 ```text
 workspace write is denied
