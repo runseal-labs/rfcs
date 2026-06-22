@@ -328,7 +328,7 @@ subscribeEvents
 disposeSession
 ```
 
-Future service methods MAY include:
+The local stdio service also defines these service-oriented methods:
 
 ```text
 getServiceStatus
@@ -336,6 +336,11 @@ getSetupStatus
 listExecutions
 getAuditEvents
 tailAudit
+```
+
+Future service methods MAY include:
+
+```text
 drainExecutions
 cleanupRuntimeRoots
 getPolicyEpoch

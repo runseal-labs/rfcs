@@ -203,12 +203,41 @@ Response:
 
 ### `getCapabilities`
 
-Returns backend and feature capabilities for the current host.
+Returns backend and feature capabilities for the current host. Clients should
+prefer `sandbox_levels`, `network_modes`, and `feature_statuses` for status
+decisions. The legacy `features` booleans are coarse presence flags retained for
+older clients and diagnostics.
 
 ```json
 {
-  "backend": "macos-seatbelt",
-  "platform": "macos",
+  "backend": "runseal-windows-reference",
+  "backend_status": "reference",
+  "platform": "windows",
+  "capability_statuses": ["supported", "experimental", "unsupported", "unavailable", "requires_setup"],
+  "sandbox_levels": {
+    "danger-full-access": "supported",
+    "read-only": "supported",
+    "workspace-contained": "supported",
+    "workspace-write": "supported"
+  },
+  "network_modes": {
+    "disabled": "supported",
+    "proxy": "supported"
+  },
+  "feature_statuses": {
+    "filesystem_policy": "supported",
+    "runtime_roots": "supported",
+    "runtime_environment": "supported",
+    "process_isolation": "supported",
+    "process_cleanup": "supported",
+    "network_disabled": "supported",
+    "network_proxy": "supported",
+    "managed_proxy": "supported",
+    "direct_network_deny": "supported",
+    "resource_limits": "unsupported",
+    "audit_jsonl": "supported",
+    "otel_export": "unsupported"
+  },
   "features": {
     "filesystem_policy": true,
     "runtime_roots": true,
