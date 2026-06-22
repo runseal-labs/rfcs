@@ -53,7 +53,7 @@ This RFC does not require:
 4. A system service installed at boot.
 5. A database-backed history store.
 6. A policy migration system.
-7. A privilege-escalation path for setup or repair.
+7. An implicit privilege-escalation path for setup or repair.
 8. A replacement for direct CLI execution.
 
 Service mode is optional. Direct CLI execution MUST remain available for debugging, CI, bootstrap, and environments where no service is running.
@@ -230,7 +230,7 @@ watchSetupStatus
 explainSetupFailure
 ```
 
-A repair or setup action MUST NOT become an implicit privilege-escalation path. Unsupported or stale setup states MUST remain structured fail-closed conditions.
+A repair or setup action MUST NOT become an implicit privilege-escalation path. Interactive Windows CLI setup MAY expose an explicit user-requested elevation switch that asks the operating system to show UAC for bootstrap or repair, but service-mode setup status and repair methods MUST keep unsupported or stale setup states as structured fail-closed conditions.
 
 ## Transport model
 
