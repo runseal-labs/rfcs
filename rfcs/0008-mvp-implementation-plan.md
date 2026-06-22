@@ -4,15 +4,15 @@
 
 RunSeal should start with a Windows reference backend MVP that proves a stable agent execution contract: policy parsing, command execution, platform backend selection, structured event streaming, audit logging, and fail-closed sandbox enforcement.
 
-Windows is the reference backend and MVP security baseline. macOS remains a first-class planned backend but is not an equal launch blocker. Linux may promote individual capabilities experimentally without becoming part of the Windows enterprise baseline.
+Windows is the complete first-class reference backend and MVP security baseline. macOS and Linux already have partial experimental enforcement, but they are not equal launch blockers and are expected to reach parity through community contributions and conformance evidence.
 
-The MVP should not try to finish enterprise proxy governance, domain rules, macOS enterprise-grade enforcement, Linux isolation, cloud execution, or UI approval flows. Those remain future layers on top of the same policy and protocol model. macOS and Linux should be easy to contribute behind the same backend trait and conformance suite, but they are not technical-preview gates.
+The MVP should not try to finish enterprise proxy governance, domain rules, macOS enterprise-grade enforcement, Linux isolation, cloud execution, or UI approval flows. Those remain future layers on top of the same policy and protocol model. macOS and Linux should be easy to improve behind the same backend trait and conformance suite, but they are not technical-preview gates.
 
 ## Goals
 
 1. Build a working `runseal` CLI and local protocol server skeleton.
 2. Implement the Windows sandbox backend first as the reference backend and enterprise security baseline.
-3. Keep macOS and Linux as compile-time/backend abstraction placeholders that can be completed through open-source contributions.
+3. Keep macOS and Linux as partial experimental backends that can be completed through open-source contributions.
 4. Support the four filesystem sandbox levels and two network modes at the product-contract level.
 5. Ensure all user-submitted command execution paths use the same policy injection path.
 6. Produce structured audit events suitable for later enterprise integration.

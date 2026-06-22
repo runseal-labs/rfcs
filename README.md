@@ -6,11 +6,11 @@ RunSeal is for agent applications that need to run real local tools without givi
 
 Unlike VM or container sandboxes, RunSeal keeps execution close to the host OS so commands can use installed toolchains, workspace files, enterprise endpoint configuration, and local app integrations. Unlike raw shell execution, every command runs through a policy-governed boundary with filesystem restrictions, proxy-only networking, synthetic home/profile roots, cleanup, and structured audit events.
 
-The Windows reference backend is the MVP enterprise baseline.
+The Windows reference backend is the complete first-class MVP enterprise baseline.
 
 > **Embeddable local security runtime for endpoint AI agents.**
 
-macOS and Linux remain part of the cross-platform contract, but their backends are contribution tracks that promote individual capabilities experimentally. Current macOS experimental coverage is limited to `read-only` and `workspace-write` with `network.disabled`. Current Linux experimental coverage is limited to `read-only` and `workspace-write` with `network.disabled`; `workspace-contained` remains unsupported until external-read containment passes conformance. A backend capability is promoted only when it passes the shared conformance suite and reports unsupported requests fail-closed.
+macOS and Linux remain part of the cross-platform contract and already have partial experimental enforcement, but they are not aligned with the Windows backend yet. Current macOS experimental coverage is limited to `read-only` and `workspace-write` with `network.disabled`. Current Linux experimental coverage is limited to `read-only` and `workspace-write` with `network.disabled`; `workspace-contained` remains unsupported until external-read containment passes conformance. Remaining parity work is expected to come through community contributions, and a backend capability is promoted only when it passes the shared conformance suite and reports unsupported requests fail-closed.
 
 RunSeal does **not** aim to be a VM platform, a Docker Desktop replacement, or a cloud multi-tenant sandbox service. It turns local agent execution into a policy-governed, auditable capability.
 
