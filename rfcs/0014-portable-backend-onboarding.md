@@ -138,7 +138,7 @@ Backends MAY maintain private compiled plans internally, but those details must 
 
 ## macOS backend strategy
 
-macOS remains an experimental local-development backend. `read-only` and `workspace-write` with `network.disabled` may run experimentally when the runtime guard is available; other sandbox levels and network modes still fail closed. `workspace-contained` is not a macOS target because endpoint agents need practical host-side tool and desktop integration.
+macOS remains a local-development backend. `read-only` and `workspace-write` with `network.disabled` are supported when the runtime guard is available; other sandbox levels and network modes still fail closed. `workspace-contained` is not a macOS target because endpoint agents need practical host-side tool and desktop integration.
 
 A future implementation may use a structure like:
 
@@ -169,9 +169,9 @@ The backend may compile logical public plans for read-only or workspace-write po
 
 Plan preview must remain platform-neutral and must not expose private profile fragments or sandbox mechanism details.
 
-### macOS phase 2: read-only experimental execution
+### macOS phase 2: read-only execution
 
-Read-only execution may be reported experimental after tests prove:
+Read-only execution may be reported supported after tests prove:
 
 ```text
 workspace write is denied
@@ -183,7 +183,7 @@ unsupported network modes fail closed
 
 ### macOS phase 3: workspace-write
 
-`workspace-write` may be reported experimental after tests prove:
+`workspace-write` may be reported supported after tests prove:
 
 ```text
 workspace writes are limited to approved roots
@@ -253,7 +253,7 @@ The first Linux step should add capability probes and public-safe diagnostics wh
 
 `danger-full-access` remains explicit local execution. All other sandboxed policies must fail closed unless a feature is implemented and tested.
 
-### Linux phase 2: bubblewrap read-only experimental
+### Linux phase 2: bubblewrap read-only execution
 
 A Linux backend may use bubblewrap or an equivalent low-level unprivileged sandboxing mechanism for initial read-only execution.
 
@@ -267,9 +267,9 @@ isolated temp root
 process cleanup
 ```
 
-### Linux phase 3: workspace-write experimental
+### Linux phase 3: workspace-write
 
-`workspace-write` with `network.disabled` may become experimental after conformance tests prove:
+`workspace-write` with `network.disabled` may become supported after conformance tests prove:
 
 ```text
 workspace-write allows approved workspace writes

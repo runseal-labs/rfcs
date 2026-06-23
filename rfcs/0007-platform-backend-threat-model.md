@@ -2,7 +2,7 @@
 
 ## Summary
 
-RunSeal prioritizes OS-native local sandboxing with Windows as the initial reference backend and enterprise security baseline. The product contract is platform-neutral, but each backend has different enforcement primitives and known gaps. macOS starts as an experimental local-development backend, and Linux may promote specific capabilities experimentally behind the same abstraction. This RFC defines the initial threat model, backend capability matrix, fail-closed requirements, and platform-specific MVP boundaries.
+RunSeal prioritizes OS-native local sandboxing with Windows as the initial reference backend and enterprise security baseline. The product contract is platform-neutral, but each backend has different enforcement primitives and known gaps. macOS and Linux support `read-only` and `workspace-write` with `network.disabled` behind the same abstraction. This RFC defines the initial threat model, backend capability matrix, fail-closed requirements, and platform-specific MVP boundaries.
 
 The implementation should expose one stable policy model to clients. It must not leak Windows ACL/SID details, macOS Seatbelt profile details, or Linux namespace details into public client APIs.
 
@@ -67,13 +67,13 @@ Sandboxed policies require explicit backend capability for filesystem policy, ru
 | --- | --- | --- | --- |
 | Backend priority | First-class / reference | Experimental contribution track | Experimental contribution track |
 | Execution isolation | Restricted local process | Seatbelt-wrapped process, capability-tested | bubblewrap / namespaces |
-| `read-only` | Required | Experimental when runtime guard is available | Experimental when runtime guard is available |
+| `read-only` | Supported | Supported with `network.disabled` | Supported with `network.disabled` |
 | `workspace-contained` | Strict compliance option | Not planned | Not planned |
-| `workspace-write` | Required | Experimental when runtime guard is available and network is disabled | Experimental when runtime guard is available and network is disabled |
+| `workspace-write` | Supported | Supported with `network.disabled` | Supported with `network.disabled` |
 | `danger-full-access` | Local execution | Local execution | Local execution |
 | Synthetic HOME/profile | Required | Experimental for `read-only` and `workspace-write` | Experimental for `read-only` and `workspace-write` |
 | Protected workspace metadata | Required | Experimental for `workspace-write` | Future |
-| Network `disabled` | Required | Experimental for `read-only` and `workspace-write` | Experimental for `read-only` and `workspace-write` |
+| Network `disabled` | Supported | Supported for `read-only` and `workspace-write` | Supported for `read-only` and `workspace-write` |
 | Network `proxy` | Proxy-only egress required | Experimental / promotion target | Future |
 | Domain rules | Not MVP | Not MVP | Future |
 | Fail closed on setup failure | Required | Required | Required |
@@ -128,7 +128,7 @@ The following Windows attack surfaces are recognized but outside the MVP enforce
 
 ## macOS backend model
 
-macOS is an experimental local-development backend for the MVP, not the initial enterprise security baseline. The implementation may use `/usr/bin/sandbox-exec` with generated Seatbelt profiles and dynamic path parameters, but each supported capability must be proven through conformance tests before it is promoted beyond experimental status.
+macOS is a local-development backend, not the initial enterprise security baseline. The implementation may use `/usr/bin/sandbox-exec` with generated Seatbelt profiles and dynamic path parameters, but each supported capability must be proven through conformance tests.
 
 Promotion requirements:
 
@@ -155,7 +155,7 @@ Known gaps and constraints:
 
 ## Linux experimental backend model
 
-Linux is not part of the Windows enterprise security baseline. Individual Linux capabilities may be promoted experimentally when runtime probes and conformance tests prove enforcement on the current host. The initial Linux execution targets are `read-only` and `workspace-write` with `network.disabled`; unsupported sandbox levels and network modes still fail closed.
+Linux is not part of the Windows enterprise security baseline. `read-only` and `workspace-write` with `network.disabled` are supported when runtime probes and conformance tests prove enforcement on the current host; unsupported sandbox levels and network modes still fail closed.
 
 Expected mapping:
 

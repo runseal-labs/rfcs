@@ -135,7 +135,7 @@ Backend selection:
 
 - Windows: use the Windows sandbox backend for all non-`danger-full-access` executions.
 - macOS: return unsupported for sandboxed execution unless an experimental backend is explicitly built and reports support for the requested capability.
-- Linux: return unsupported for sandboxed execution unless the requested capability has conformance evidence; `read-only` and `workspace-write` with `network.disabled` may run experimentally when the runtime guard is available.
+- Linux: return unsupported for sandboxed execution unless the requested capability has conformance evidence; `read-only` and `workspace-write` with `network.disabled` are supported when the runtime guard is available.
 
 ### Phase 3: Windows reference backend
 
@@ -281,7 +281,7 @@ Recommended order for agent implementation:
 3. Add backend trait and capability reporting.
 4. Implement Windows backend enough for CI/manual verification on Windows.
 5. Add macOS and Linux backend skeletons that report unsupported capabilities fail-closed.
-6. Promote Linux `read-only` and `workspace-write` with `network.disabled` experimentally when runtime probes and conformance tests prove enforcement.
+6. Support Linux `read-only` and `workspace-write` with `network.disabled` when runtime probes and conformance tests prove enforcement.
 7. Add JSONL audit events for all execution paths.
 8. Add JSON-RPC stdio protocol and event subscription.
 9. Add managed proxy guard abstraction and proxy-only tests.
