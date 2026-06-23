@@ -4,13 +4,13 @@
 
 RunSeal 面向需要执行真实本地工具，同时不能把端点完全交给 Agent 控制的 Agent 应用。
 
-它不是 VM，也不是 Docker 替代品。它让 Agent 继续受益于 host OS 上已有的工具链、企业配置、本地应用和工作区文件，同时把每次本地命令执行收进可配置、可审计、可失败关闭的安全边界里，包含文件系统限制、仅代理出网、合成 home/profile 根目录、执行后清理和结构化审计事件。
+它不是 VM，也不是 Docker 替代品。它让 Agent 继续受益于 host OS 上已有的工具链、企业配置、本地应用、工作区文件和未显式管控的直通网络，同时把每次本地命令执行收进可配置、可审计、可失败关闭的安全边界里，包含文件系统限制、可选网络控制、合成 home/profile 根目录、执行后清理和结构化审计事件。
 
 Windows reference backend 是企业端 MVP 基线。
 
 > **端侧 AI Agent 的可嵌入安全执行运行时。**
 
-macOS 和 Linux 仍属于同一套跨平台契约，但它们不需要镜像 Windows-only 的 strict compliance 选项。`read-only` 和 `workspace-write` 搭配 `network.disabled` 在 Windows、macOS、Linux 三个平台都 supported。`workspace-contained` 是 Windows-only 的 strict compliance 选项，不是 portable parity 目标。任何后端能力只有通过共享 conformance suite，并且对未支持请求 fail-closed，才能升级为更强承诺。
+macOS 和 Linux 仍属于同一套跨平台契约，但它们不需要镜像 Windows-only 的 strict compliance 选项。`read-only` 和 `workspace-write` 在 Windows、macOS、Linux 三个平台都 supported，默认网络语义是 unmanaged 直通。`workspace-contained` 是 Windows-only 的 strict compliance 选项，不是 portable parity 目标。任何后端能力只有通过共享 conformance suite，并且对未支持请求 fail-closed，才能升级为更强承诺。
 
 RunSeal 不定位为 VM 平台、Docker Desktop 替代品或云端多租户沙箱服务。它的目标是把本地 Agent 执行变成一种受策略约束、可审计、可集成的能力。
 
@@ -22,7 +22,7 @@ RunSeal 关注四类边界：
 
 - **文件系统**：限制读写根目录，保护 workspace 元数据和宿主凭据目录。
 - **进程执行**：把一次命令或工具调用建模为可追踪的 `Execution`。
-- **网络访问**：支持禁用网络，或只允许通过 managed proxy 出网。
+- **网络访问**：默认 unmanaged 直通；需要网络管控时支持禁用网络，或只允许通过 managed proxy 出网。
 - **审计事件**：记录执行生命周期、策略决策、拒绝原因、代理生命周期和最终结果。
 - **保留 host OS 能力**：已安装的工具链、工作区文件、企业配置和本地应用集成在沙箱边界内仍然可用。
 
@@ -35,7 +35,7 @@ RunSeal 采用 Codex-style 的分层模型：
 - **Execution**：沙箱内的一次命令或工具运行，不把它等同于裸进程。
 - **Controlled proxy**：企业场景下的统一网络出口，用于路由控制、凭据注入、脱敏和审计。
 
-公开 API 保持平台无关：客户端只需要理解 `read-only`、`workspace-contained`、`workspace-write`、`danger-full-access` 等 sandbox level，以及 `disabled` / `proxy` 网络模式；不需要关心 Windows ACL、macOS Seatbelt profile 或 Linux namespace 的具体实现。
+公开 API 保持平台无关：客户端只需要理解 `read-only`、`workspace-contained`、`workspace-write`、`danger-full-access` 等 sandbox level，以及 `unmanaged` / `disabled` / `proxy` 网络模式；不需要关心 Windows ACL、macOS Seatbelt profile 或 Linux namespace 的具体实现。
 
 
 ## 架构流程
@@ -65,7 +65,7 @@ flowchart LR
 
 - Windows：优先验证受限本地执行身份、文件 ACL、网络阻断和 proxy-only egress，并作为标准的可运行证明。
 - macOS：作为 experimental backend 贡献方向，先验证 `/usr/bin/sandbox-exec` / Seatbelt profile 的本地开发可用性，不进入企业强安全基线。
-- Linux：按 runtime probe 和 conformance evidence 实验性升级单项能力；当前方向先覆盖 `read-only` + `network.disabled`，其他 sandbox level 仍 fail-closed。
+- Linux：按 runtime probe 和 conformance evidence 实验性升级单项能力；当前方向先覆盖 `read-only` / `workspace-write` + 默认 unmanaged 网络，其他 sandbox level 仍 fail-closed。
 
 MVP 的重点是跑通：
 
@@ -103,6 +103,7 @@ MVP 的重点是跑通：
 ```bash
 runseal exec --policy workspace-write --network proxy -- pnpm test
 runseal exec --policy workspace-write --network disabled -- python skill.py
+runseal exec --policy workspace-write -- pnpm test
 ```
 
 协议方法名是 `execute`；返回的领域对象是 `Execution`，不是裸 process。
@@ -113,7 +114,7 @@ runseal exec --policy workspace-write --network disabled -- python skill.py
 - 不做 Docker Desktop 替代品。
 - MVP 不引入 VM / microVM / container daemon 依赖。
 - 不把密钥直接注入沙箱进程。
-- 企业默认场景不允许非托管直连网络。
+- 请求企业网络管控时不允许绕过受管网络边界直连。
 - 不承诺 OS-native sandbox 可以防住所有 kernel-level escape。
 - MVP 不实现完整域名 allowlist / denylist 规则引擎。
 - 不是一个通用的 sandbox CLI——专为 Agent 应用、IDE、RPA 平台和企业 AI 平台嵌入而设计。

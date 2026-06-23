@@ -221,6 +221,7 @@ older clients and diagnostics.
     "workspace-write": "supported"
   },
   "network_modes": {
+    "unmanaged": "supported",
     "disabled": "supported",
     "proxy": "supported"
   },

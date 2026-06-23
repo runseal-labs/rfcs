@@ -22,7 +22,7 @@ RunSeal policies define what an execution may read, write, execute, connect to, 
 {
   "version": "runseal.policy/v1",
   "id": "workspace-write",
-  "description": "Workspace write access with proxy networking",
+  "description": "Workspace write access",
   "filesystem": {},
   "process": {},
   "network": {},
@@ -87,10 +87,11 @@ Rules:
 
 Modes:
 
+- `unmanaged`
 - `disabled`
 - `proxy`
 
-Enterprise default should be `proxy` or `disabled`; unmanaged `direct` networking is not part of the MVP policy surface.
+When `network` is omitted, the effective default is `unmanaged`: RunSeal does not install a network guard and direct host networking remains available. Enterprise deployments that need network control should request `disabled` or `proxy` explicitly and fail closed when the backend cannot enforce the requested mode.
 
 ## Environment policy
 
@@ -187,7 +188,7 @@ Initial profile names:
 - `workspace-write`
 - `danger-full-access` (unsafe, explicit only)
 
-`network.mode` is selected independently as `disabled` or `proxy`. Profiles may provide defaults, but the schema keeps filesystem level and network mode as separate dimensions.
+`network.mode` is selected independently as `unmanaged`, `disabled`, or `proxy`. Profiles may provide defaults, but the schema keeps filesystem level and network mode as separate dimensions.
 
 ## Effective policy hash
 

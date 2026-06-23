@@ -138,7 +138,7 @@ Backends MAY maintain private compiled plans internally, but those details must 
 
 ## macOS backend strategy
 
-macOS remains a local-development backend. `read-only` and `workspace-write` with `network.disabled` are supported when the runtime guard is available; other sandbox levels and network modes still fail closed. `workspace-contained` is not a macOS target because endpoint agents need practical host-side tool and desktop integration.
+macOS remains a local-development backend. `read-only` and `workspace-write` are supported with default unmanaged networking when the runtime guard is available; unsupported sandbox levels and managed network modes still fail closed. `workspace-contained` is not a macOS target because endpoint agents need practical host-side tool and desktop integration.
 
 A future implementation may use a structure like:
 
@@ -178,7 +178,7 @@ workspace write is denied
 expected read roots are accessible
 runtime roots are prepared safely
 audit and event shapes remain unchanged
-unsupported network modes fail closed
+explicit managed network modes fail closed when unsupported
 ```
 
 ### macOS phase 3: workspace-write
@@ -199,7 +199,7 @@ protected subpaths remain protected
 
 Network features should be added after filesystem and runtime isolation are stable.
 
-No macOS network mode should be claimed supported until direct bypass tests pass for that mode.
+`network.unmanaged` may be claimed supported when direct host networking remains available by design. `network.disabled` and `network.proxy` should not be claimed supported until direct bypass tests pass for that mode.
 
 ## Linux backend strategy
 
@@ -269,7 +269,7 @@ process cleanup
 
 ### Linux phase 3: workspace-write
 
-`workspace-write` with `network.disabled` may become supported after conformance tests prove:
+`workspace-write` may become supported after conformance tests prove:
 
 ```text
 workspace-write allows approved workspace writes

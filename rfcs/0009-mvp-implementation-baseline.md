@@ -40,12 +40,12 @@ The following boundaries are accepted and implementation-ready:
 2. **Platform priority**: Windows is the first-class MVP reference backend and initial enterprise security baseline. macOS is experimental, and Linux remains non-baseline while allowing conformance-gated experimental capability promotion.
 3. **Public policy model**: filesystem sandbox level and network mode are separate dimensions.
 4. **Sandbox levels**: `read-only`, `workspace-contained`, `workspace-write`, and `danger-full-access` are the MVP filesystem levels.
-5. **Network modes**: `disabled` and `proxy` are the MVP network modes. Unmanaged direct networking is outside the MVP policy surface.
+5. **Network modes**: `unmanaged`, `disabled`, and `proxy` are the MVP network modes. Omitting `network` defaults to unmanaged direct networking; enterprise network controls must request `disabled` or `proxy` explicitly.
 6. **Fail-closed posture**: unsupported or partially enforceable policies must return structured errors; the implementation must not silently fall back to unrestricted execution.
 7. **Windows backend target**: use restricted local execution identity plus OS policy controls such as ACLs, restricted tokens, Job Objects/AppContainer where available, and network restrictions/proxy-only egress.
 8. **Windows identity and epoch model**: Windows MVP uses one private sandbox identity, one active effective policy cohort, immutable per-execution `policy_hash`/`policy_epoch`, same-policy concurrency only, and fail-closed mixed-policy transitions.
 9. **macOS backend target**: use `/usr/bin/sandbox-exec` with generated Seatbelt profiles, safe dynamic path injection, and canonical/raw path modeling, but treat macOS as experimental until conformance evidence proves each claimed capability. `workspace-contained` is not a macOS target.
-10. **Linux posture**: Linux sandbox support is capability-driven; `read-only` and `workspace-write` with `network.disabled` are supported when runtime probes and conformance tests prove enforcement, while unsupported sandboxed requests still fail closed.
+10. **Linux posture**: Linux sandbox support is capability-driven; `read-only` and `workspace-write` with default unmanaged networking are supported when runtime probes and conformance tests prove enforcement, while unsupported sandboxed requests still fail closed.
 11. **Proxy posture**: MVP starts with a managed HTTP proxy guard and proxy lifecycle audit events. Domain/CIDR/method/path rules and body inspection are post-MVP extensions.
 12. **Secrets posture**: real credentials stay outside sandbox process environment. Credential injection belongs at the proxy boundary or future trusted host extensions.
 13. **Protocol shape**: JSON-RPC 2.0 over stdio is the MVP transport; Unix socket/named pipe/HTTP bridge can follow without changing method semantics.
@@ -76,7 +76,7 @@ The RFC set reaches PRD-ready state when all of the following are true:
 
 - README and README.zh-CN describe the same public product boundary and link to all RFCs.
 - RFC-0001 defines the OS-native abstraction and closes upstream reuse/backend exposure questions for MVP.
-- RFC-0002 defines `disabled` and `proxy` as MVP network modes, with direct/domain routing/body inspection deferred.
+- RFC-0002 defines controlled `disabled` and `proxy` behavior, while RFC-0003 defines `unmanaged` as the default non-controlled network mode; domain routing/body inspection is deferred.
 - RFC-0003 defines stable policy shape, canonical JSON, MVP profiles, and strict effective-policy hashing.
 - RFC-0004 defines event envelopes and MVP audit retention/output-body decisions.
 - RFC-0005 defines synthetic home, cache posture, and explicit real-home handling.
@@ -105,7 +105,7 @@ The following are intentionally not required before MVP coding begins:
 - MCP server implementation.
 - Complete automatic discovery of every package-manager cache and language runtime.
 - Long-lived explicit session APIs beyond implicit execution sessions. RFC-0013 defines the follow-up service-mode direction, but service mode is not required before the Windows-first MVP implementation begins.
-- macOS/Linux capabilities beyond `read-only` and `workspace-write` with `network.disabled`. RFC-0014 defines the follow-up portable backend onboarding direction, and non-Windows backend promotion remains gated on conformance evidence.
+- macOS/Linux capabilities beyond `read-only` and `workspace-write` with default unmanaged networking. RFC-0014 defines the follow-up portable backend onboarding direction, and non-Windows backend promotion remains gated on conformance evidence.
 
 ## Review decision
 

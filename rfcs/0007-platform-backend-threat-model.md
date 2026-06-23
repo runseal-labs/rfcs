@@ -2,7 +2,7 @@
 
 ## Summary
 
-RunSeal prioritizes OS-native local sandboxing with Windows as the initial reference backend and enterprise security baseline. The product contract is platform-neutral, but each backend has different enforcement primitives and known gaps. macOS and Linux support `read-only` and `workspace-write` with `network.disabled` behind the same abstraction. This RFC defines the initial threat model, backend capability matrix, fail-closed requirements, and platform-specific MVP boundaries.
+RunSeal prioritizes OS-native local sandboxing with Windows as the initial reference backend and enterprise security baseline. The product contract is platform-neutral, but each backend has different enforcement primitives and known gaps. macOS and Linux support `read-only` and `workspace-write` with default unmanaged networking behind the same abstraction. This RFC defines the initial threat model, backend capability matrix, fail-closed requirements, and platform-specific MVP boundaries.
 
 The implementation should expose one stable policy model to clients. It must not leak Windows ACL/SID details, macOS Seatbelt profile details, or Linux namespace details into public client APIs.
 
@@ -43,7 +43,7 @@ Out of scope:
 - Attacks against trusted host-side helpers or the parent application.
 - Exfiltration through already-authorized read roots.
 - Side channels such as timing, CPU cache behavior, UI automation, clipboard, screen capture, or accessibility APIs unless explicitly restricted by a future backend.
-- Network governance finer than disabled/proxy in the MVP.
+- Network governance finer than unmanaged/disabled/proxy in the MVP.
 - Complete automatic discovery of every local language runtime and package-manager cache.
 
 ## Common policy contract
@@ -51,7 +51,7 @@ Out of scope:
 The public policy surface is shared across all platforms:
 
 - Sandbox levels: `read-only`, `workspace-contained`, `workspace-write`, `danger-full-access`.
-- Network modes: `disabled`, `proxy`.
+- Network modes: `unmanaged`, `disabled`, `proxy`.
 - Runtime roots: synthetic HOME/profile/tmp roots for sandboxed commands.
 - Toolchain roots: explicit read allowlist for executable and runtime dependencies.
 - Protected subpaths: workspace metadata that remains non-writable even when a broader writable root covers the workspace.
@@ -59,7 +59,7 @@ The public policy surface is shared across all platforms:
 `danger-full-access` is local execution. It does not claim filesystem or network hard boundaries.
 
 All other sandbox levels must use the platform backend when supported. If RunSeal cannot enforce the requested policy, it must fail closed with a structured error. A backend may report an experimental or unsupported capability, but it must not silently present partial enforcement as strong sandboxing.
-Sandboxed policies require explicit backend capability for filesystem policy, runtime roots, runtime environment redirects, process isolation, process cleanup, direct network denial, and the requested network mode. When proxy mode is requested, the backend must also report managed proxy capability.
+Sandboxed policies require explicit backend capability for filesystem policy, runtime roots, runtime environment redirects, process isolation, process cleanup, and any requested managed network mode. When proxy mode is requested, the backend must also report managed proxy capability.
 
 ## Capability matrix
 
@@ -67,12 +67,13 @@ Sandboxed policies require explicit backend capability for filesystem policy, ru
 | --- | --- | --- | --- |
 | Backend priority | First-class / reference | Experimental contribution track | Experimental contribution track |
 | Execution isolation | Restricted local process | Seatbelt-wrapped process, capability-tested | bubblewrap / namespaces |
-| `read-only` | Supported | Supported with `network.disabled` | Supported with `network.disabled` |
+| `read-only` | Supported | Supported | Supported |
 | `workspace-contained` | Strict compliance option | Not planned | Not planned |
-| `workspace-write` | Supported | Supported with `network.disabled` | Supported with `network.disabled` |
+| `workspace-write` | Supported | Supported | Supported |
 | `danger-full-access` | Local execution | Local execution | Local execution |
 | Synthetic HOME/profile | Required | Experimental for `read-only` and `workspace-write` | Experimental for `read-only` and `workspace-write` |
 | Protected workspace metadata | Required | Experimental for `workspace-write` | Future |
+| Network `unmanaged` | Supported | Supported for `read-only` and `workspace-write` | Supported for `read-only` and `workspace-write` |
 | Network `disabled` | Supported | Supported for `read-only` and `workspace-write` | Supported for `read-only` and `workspace-write` |
 | Network `proxy` | Proxy-only egress required | Experimental / promotion target | Future |
 | Domain rules | Not MVP | Not MVP | Future |
@@ -140,6 +141,7 @@ Promotion requirements:
 - Use literal-only reads for path traversal nodes when needed, avoiding broad subtree reads.
 - Keep `.git`, `.agents`, and `.codex` non-writable inside the workspace by default.
 - In `workspace-write`, allow broad reads but limit writes to workspace/runtime/temp plus explicitly allowed roots.
+- Leave outbound network permissions available for `network.unmanaged`.
 - Enforce `network.disabled` by omitting outbound network permissions.
 - Enforce `network.proxy` by starting a managed local HTTP proxy, injecting proxy environment variables, and only allowing the sandboxed process to reach that loopback proxy endpoint.
 - Bind proxy lifetime to the command/policy guard; when the command ends or is cancelled, proxy listeners and forwarding tasks must be stopped.
@@ -155,12 +157,13 @@ Known gaps and constraints:
 
 ## Linux experimental backend model
 
-Linux is not part of the Windows enterprise security baseline. `read-only` and `workspace-write` with `network.disabled` are supported when runtime probes and conformance tests prove enforcement on the current host; unsupported sandbox levels and network modes still fail closed.
+Linux is not part of the Windows enterprise security baseline. `read-only` and `workspace-write` are supported with default unmanaged networking when runtime probes and conformance tests prove enforcement on the current host; unsupported sandbox levels and managed network modes still fail closed.
 
 Expected mapping:
 
 - `readRoots` and `writeRoots` map to read-only and writable bind mounts.
 - Deny roots are omitted or shadowed with empty dirs/tmpfs where needed.
+- `network.unmanaged` keeps the host network namespace available.
 - `network.disabled` maps to network namespace isolation.
 - Resource policy can later map to cgroups/seccomp where appropriate.
 - Toolchain compatibility should remain explicit rather than defaulting to host-wide access.

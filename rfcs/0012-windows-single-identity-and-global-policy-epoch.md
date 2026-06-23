@@ -67,7 +67,7 @@ The Windows backend MUST prevent one execution from reading or writing another e
 
 ## Network semantics
 
-`network.disabled` MUST block direct egress at the OS enforcement boundary. `network.proxy` MUST allow only the managed proxy path and MUST block direct socket bypass. Unmanaged direct networking remains outside the MVP policy surface.
+`network.unmanaged` means RunSeal does not install a network guard and direct host networking remains available. `network.disabled` MUST block direct egress at the OS enforcement boundary. `network.proxy` MUST allow only the managed proxy path and MUST block direct socket bypass.
 
 A Windows backend MAY implement `network.disabled` and `network.proxy` with the same static OS-level network guard when:
 

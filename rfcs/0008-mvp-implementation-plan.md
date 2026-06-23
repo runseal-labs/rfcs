@@ -135,7 +135,7 @@ Backend selection:
 
 - Windows: use the Windows sandbox backend for all non-`danger-full-access` executions.
 - macOS: return unsupported for sandboxed execution unless an experimental backend is explicitly built and reports support for the requested capability.
-- Linux: return unsupported for sandboxed execution unless the requested capability has conformance evidence; `read-only` and `workspace-write` with `network.disabled` are supported when the runtime guard is available.
+- Linux: return unsupported for sandboxed execution unless the requested capability has conformance evidence; `read-only` and `workspace-write` with default unmanaged networking are supported when the runtime guard is available.
 
 ### Phase 3: Windows reference backend
 
@@ -169,6 +169,7 @@ Prepare a macOS backend skeleton and promotion criteria, without making macOS a 
 - Build path plans with canonical/raw path variants for temp and `/private/var` style roots.
 - Support `read-only` and `workspace-write` semantics.
 - Protect workspace metadata directories by default.
+- For unmanaged networking, leave direct host networking available.
 - For `network.disabled`, omit network permissions.
 - For `network.proxy`, start a managed local HTTP proxy, inject proxy environment variables, and only allow the loopback proxy endpoint.
 - Stop proxy listeners and forwarding tasks when the command exits or is cancelled.
@@ -281,7 +282,7 @@ Recommended order for agent implementation:
 3. Add backend trait and capability reporting.
 4. Implement Windows backend enough for CI/manual verification on Windows.
 5. Add macOS and Linux backend skeletons that report unsupported capabilities fail-closed.
-6. Support Linux `read-only` and `workspace-write` with `network.disabled` when runtime probes and conformance tests prove enforcement.
+6. Support Linux `read-only` and `workspace-write` with default unmanaged networking when runtime probes and conformance tests prove enforcement.
 7. Add JSONL audit events for all execution paths.
 8. Add JSON-RPC stdio protocol and event subscription.
 9. Add managed proxy guard abstraction and proxy-only tests.
