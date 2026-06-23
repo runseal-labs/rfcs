@@ -10,7 +10,7 @@ The Windows reference backend is the complete first-class MVP enterprise baselin
 
 > **Embeddable local security runtime for endpoint AI agents.**
 
-macOS and Linux remain part of the cross-platform contract and already have partial experimental enforcement, but they are not aligned with the Windows backend yet. Current macOS experimental coverage is limited to `read-only` and `workspace-write` with `network.disabled`. Current Linux experimental coverage is limited to `read-only` and `workspace-write` with `network.disabled`; `workspace-contained` remains unsupported until external-read containment passes conformance. Remaining parity work is expected to come through community contributions, and a backend capability is promoted only when it passes the shared conformance suite and reports unsupported requests fail-closed.
+macOS and Linux remain part of the cross-platform contract and already have partial experimental enforcement, but they are not intended to mirror every Windows-only compliance option. Current macOS experimental coverage is limited to `read-only` and `workspace-write` with `network.disabled`. Current Linux experimental coverage is limited to `read-only` and `workspace-write` with `network.disabled`. `workspace-contained` is a strict Windows-only compliance option, not a portable parity target. A backend capability is promoted only when it passes the shared conformance suite and reports unsupported requests fail-closed.
 
 RunSeal does **not** aim to be a VM platform, a Docker Desktop replacement, or a cloud multi-tenant sandbox service. It turns local agent execution into a policy-governed, auditable capability.
 
@@ -73,7 +73,7 @@ The primary CLI verb is `exec`:
 
 ```bash
 runseal exec --policy workspace-write --network proxy -- pnpm test
-runseal exec --policy workspace-contained --network disabled -- python skill.py
+runseal exec --policy workspace-write --network disabled -- python skill.py
 ```
 
 The protocol method is `execute`; the returned domain object is an `Execution`, not a raw process.

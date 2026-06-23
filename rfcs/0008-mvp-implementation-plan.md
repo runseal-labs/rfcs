@@ -167,7 +167,7 @@ Prepare a macOS backend skeleton and promotion criteria, without making macOS a 
 - Generate Seatbelt profiles from the normalized policy.
 - Pass dynamic roots through safe `-D` parameters or equivalent escaping-safe substitutions.
 - Build path plans with canonical/raw path variants for temp and `/private/var` style roots.
-- Support `read-only`, `workspace-contained`, and `workspace-write` semantics.
+- Support `read-only` and `workspace-write` semantics.
 - Protect workspace metadata directories by default.
 - For `network.disabled`, omit network permissions.
 - For `network.proxy`, start a managed local HTTP proxy, inject proxy environment variables, and only allow the loopback proxy endpoint.
@@ -179,7 +179,6 @@ macOS promotion tests should cover:
 - workspace write succeeds in `workspace-write`.
 - workspace-external write fails in `workspace-write`.
 - workspace write fails in `read-only`.
-- `workspace-contained` cannot read broad host home paths unless explicitly allowed.
 - `.git`, `.agents`, `.codex` writes fail by default.
 - network fails in `disabled`.
 - proxy guard shuts down after command completion/cancellation.
@@ -238,15 +237,15 @@ Redaction rules:
 MVP should include named built-in profiles:
 
 - `read-only`: broad safe read where platform allows, no writes, network disabled by default.
-- `workspace-contained`: workspace/runtime/toolchain/platform roots only, workspace/runtime writable, network disabled by default unless explicitly set to proxy.
+- `workspace-contained`: Windows-only strict compliance profile for deployments that require host-read containment.
 - `workspace-write`: default readable surface, workspace/runtime writable, network proxy by default.
 - `danger-full-access`: local execution, explicit high-risk mode.
 
 Suggested product defaults:
 
 - Developer default: `workspace-write + proxy`.
-- Untrusted workspace: `workspace-contained + disabled`.
-- Enterprise/unattended default: `workspace-contained + proxy`.
+- Untrusted workspace: `workspace-write + disabled`.
+- Enterprise/unattended default: `workspace-write + proxy`.
 - Diagnostics: `danger-full-access`, explicit only.
 
 ## Conformance test matrix

@@ -10,7 +10,7 @@ Windows reference backend 是企业端 MVP 基线。
 
 > **端侧 AI Agent 的可嵌入安全执行运行时。**
 
-macOS 和 Linux 仍属于同一套跨平台契约，但它们是按单项 capability 实验性升级的开放贡献方向。当前 macOS experimental 覆盖范围限于 `read-only` 和 `workspace-write` 搭配 `network.disabled`。当前 Linux experimental 覆盖范围限于 `read-only` 和 `workspace-write` 搭配 `network.disabled`；`workspace-contained` 在 external-read containment 通过 conformance 前仍为 unsupported。任何后端能力只有通过共享 conformance suite，并且对未支持请求 fail-closed，才能升级为更强承诺。
+macOS 和 Linux 仍属于同一套跨平台契约，但它们不需要镜像 Windows-only 的 strict compliance 选项。当前 macOS experimental 覆盖范围限于 `read-only` 和 `workspace-write` 搭配 `network.disabled`。当前 Linux experimental 覆盖范围限于 `read-only` 和 `workspace-write` 搭配 `network.disabled`。`workspace-contained` 是 Windows-only 的 strict compliance 选项，不是 portable parity 目标。任何后端能力只有通过共享 conformance suite，并且对未支持请求 fail-closed，才能升级为更强承诺。
 
 RunSeal 不定位为 VM 平台、Docker Desktop 替代品或云端多租户沙箱服务。它的目标是把本地 Agent 执行变成一种受策略约束、可审计、可集成的能力。
 
@@ -102,7 +102,7 @@ MVP 的重点是跑通：
 
 ```bash
 runseal exec --policy workspace-write --network proxy -- pnpm test
-runseal exec --policy workspace-contained --network disabled -- python skill.py
+runseal exec --policy workspace-write --network disabled -- python skill.py
 ```
 
 协议方法名是 `execute`；返回的领域对象是 `Execution`，不是裸 process。

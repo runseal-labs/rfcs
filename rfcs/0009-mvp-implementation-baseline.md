@@ -44,7 +44,7 @@ The following boundaries are accepted and implementation-ready:
 6. **Fail-closed posture**: unsupported or partially enforceable policies must return structured errors; the implementation must not silently fall back to unrestricted execution.
 7. **Windows backend target**: use restricted local execution identity plus OS policy controls such as ACLs, restricted tokens, Job Objects/AppContainer where available, and network restrictions/proxy-only egress.
 8. **Windows identity and epoch model**: Windows MVP uses one private sandbox identity, one active effective policy cohort, immutable per-execution `policy_hash`/`policy_epoch`, same-policy concurrency only, and fail-closed mixed-policy transitions.
-9. **macOS backend target**: use `/usr/bin/sandbox-exec` with generated Seatbelt profiles, safe dynamic path injection, canonical/raw path modeling, and proxy-only egress when network is enabled, but treat macOS as experimental until conformance evidence proves each supported capability.
+9. **macOS backend target**: use `/usr/bin/sandbox-exec` with generated Seatbelt profiles, safe dynamic path injection, and canonical/raw path modeling, but treat macOS as experimental until conformance evidence proves each claimed capability. `workspace-contained` is not a macOS target.
 10. **Linux posture**: Linux sandbox support is capability-driven and experimental; `read-only` and `workspace-write` with `network.disabled` may run when runtime probes and conformance tests prove enforcement, while unsupported sandboxed requests still fail closed.
 11. **Proxy posture**: MVP starts with a managed HTTP proxy guard and proxy lifecycle audit events. Domain/CIDR/method/path rules and body inspection are post-MVP extensions.
 12. **Secrets posture**: real credentials stay outside sandbox process environment. Credential injection belongs at the proxy boundary or future trusted host extensions.
@@ -99,7 +99,7 @@ The following are intentionally not required before MVP coding begins:
 - Full enterprise route composition and organization-wide policy inheritance.
 - Response body inspection/redaction plugins.
 - macOS enterprise-baseline backend implementation.
-- Linux workspace-contained and proxy backend implementation.
+- Linux proxy backend implementation.
 - VM/microVM/container daemon backends.
 - Interactive approval UI.
 - MCP server implementation.

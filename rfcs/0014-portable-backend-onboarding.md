@@ -138,7 +138,7 @@ Backends MAY maintain private compiled plans internally, but those details must 
 
 ## macOS backend strategy
 
-macOS remains an experimental local-development backend. `read-only` and `workspace-write` with `network.disabled` may run experimentally when the runtime guard is available; other sandbox levels and network modes still fail closed until conformance evidence promotes them.
+macOS remains an experimental local-development backend. `read-only` and `workspace-write` with `network.disabled` may run experimentally when the runtime guard is available; other sandbox levels and network modes still fail closed. `workspace-contained` is not a macOS target because endpoint agents need practical host-side tool and desktop integration.
 
 A future implementation may use a structure like:
 
@@ -181,7 +181,7 @@ audit and event shapes remain unchanged
 unsupported network modes fail closed
 ```
 
-### macOS phase 3: workspace-write and workspace-contained
+### macOS phase 3: workspace-write
 
 `workspace-write` may be reported experimental after tests prove:
 
@@ -193,7 +193,7 @@ temp roots are isolated
 protected subpaths remain protected
 ```
 
-`workspace-contained` may be claimed only after tests also prove external reads are denied.
+`workspace-contained` remains unsupported on macOS by design.
 
 ### macOS phase 4: network
 
@@ -278,7 +278,7 @@ runtime roots are per execution
 protected subpaths remain protected
 ```
 
-`workspace-contained` with `network.disabled` may become experimental after conformance tests prove external reads are denied without relying on broad host reads.
+`workspace-contained` remains unsupported on Linux by design.
 
 ### Linux phase 4: Landlock augmentation
 

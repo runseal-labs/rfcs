@@ -68,7 +68,7 @@ Sandboxed policies require explicit backend capability for filesystem policy, ru
 | Backend priority | First-class / reference | Experimental contribution track | Experimental contribution track |
 | Execution isolation | Restricted local process | Seatbelt-wrapped process, capability-tested | bubblewrap / namespaces |
 | `read-only` | Required | Experimental when runtime guard is available | Experimental when runtime guard is available |
-| `workspace-contained` | Required | Promotion target | Promotion target; unsupported until external-read containment passes conformance |
+| `workspace-contained` | Strict compliance option | Not planned | Not planned |
 | `workspace-write` | Required | Experimental when runtime guard is available and network is disabled | Experimental when runtime guard is available and network is disabled |
 | `danger-full-access` | Local execution | Local execution | Local execution |
 | Synthetic HOME/profile | Required | Experimental for `read-only` and `workspace-write` | Experimental for `read-only` and `workspace-write` |
@@ -91,7 +91,7 @@ Required behavior:
 - Platform plan previews may expose logical process boundary state such as restricted local process, low-privilege identity requirement, and process-tree cleanup requirement, but must not expose SIDs, token attributes, integrity levels, Job Object handles, helper identities, or host-specific profile names.
 - Redirect HOME, AppData, LocalAppData, Temp, and Tmp to the sandbox runtime root.
 - Platform plan previews may expose logical runtime environment redirects such as HOME, USERPROFILE, APPDATA, LOCALAPPDATA, TEMP, TMP, RUNSEAL_HOME, and RUNSEAL_TMP, but must not expose backend-private identity, ACL, token, firewall, or helper details.
-- Protect the real user profile and common credential directories from sandboxed reads in `workspace-contained`.
+- Protect the real user profile and common credential directories from sandboxed reads in `workspace-contained` for strict-compliance deployments.
 - Platform plan previews may expose logical protected filesystem categories such as workspace metadata, host profile, and credential roots, but must not expose resolved host-profile or credential paths.
 - Deny writes outside allowed roots in `read-only`, `workspace-contained`, and `workspace-write`.
 - Keep workspace metadata such as `.git`, `.agents`, and `.codex` non-writable by default.
@@ -139,12 +139,12 @@ Promotion requirements:
 - Model raw and canonical paths for `/tmp`, `/var`, and `/private/var` style symlinked roots.
 - Use literal-only reads for path traversal nodes when needed, avoiding broad subtree reads.
 - Keep `.git`, `.agents`, and `.codex` non-writable inside the workspace by default.
-- In `workspace-contained`, avoid global `file-read*`; allow only workspace/runtime/toolchain/platform roots needed for execution.
 - In `workspace-write`, allow broad reads but limit writes to workspace/runtime/temp plus explicitly allowed roots.
 - Enforce `network.disabled` by omitting outbound network permissions.
 - Enforce `network.proxy` by starting a managed local HTTP proxy, injecting proxy environment variables, and only allowing the sandboxed process to reach that loopback proxy endpoint.
 - Bind proxy lifetime to the command/policy guard; when the command ends or is cancelled, proxy listeners and forwarding tasks must be stopped.
 - Report unsupported or degraded capabilities explicitly instead of treating Seatbelt coverage as equivalent to the Windows reference backend.
+- Keep `workspace-contained` unsupported on macOS; endpoint agent usefulness depends on practical host-side tool and desktop integration.
 
 Known gaps and constraints:
 
