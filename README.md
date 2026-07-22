@@ -66,6 +66,7 @@ flowchart LR
 14. [RFC-0014: Portable backend onboarding for macOS and Linux](rfcs/0014-portable-backend-onboarding.md)
 15. [RFC-0015: Escape definition and adversarial conformance model](rfcs/0015-escape-definition-and-adversarial-conformance.md)
 16. [RFC-0016: Adversarial conformance harness and case format](rfcs/0016-adversarial-conformance-harness-and-case-format.md)
+17. [RFC-0017: Windows workspace-contained boundary amendment](rfcs/0017-windows-workspace-contained-boundary.md)
 
 ## CLI vocabulary
 
