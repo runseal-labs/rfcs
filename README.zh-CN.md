@@ -97,6 +97,7 @@ MVP 的重点是跑通：
 16. [RFC-0016：Adversarial conformance harness and case format](rfcs/0016-adversarial-conformance-harness-and-case-format.md)
 17. [RFC-0017：Windows workspace-contained boundary amendment](rfcs/0017-windows-workspace-contained-boundary.md)
 18. [RFC-0018：Portable workspace-contained boundary amendment](rfcs/0018-portable-workspace-contained-boundary.md)
+19. [RFC-0019：macOS managed proxy network boundary amendment](rfcs/0019-macos-managed-proxy-network-boundary.md)
 
 ## CLI 词汇
 
