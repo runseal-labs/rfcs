@@ -138,7 +138,10 @@ Backends MAY maintain private compiled plans internally, but those details must 
 
 ## macOS backend strategy
 
-macOS remains a local-development backend. `read-only` and `workspace-write` are supported with default unmanaged networking when the runtime guard is available; unsupported sandbox levels and managed network modes still fail closed. `workspace-contained` is not a macOS target because endpoint agents need practical host-side tool and desktop integration.
+macOS remains a local-development backend. `read-only`, `workspace-write`, and
+the RFC-0018 `workspace-contained` boundary are supported on the experimental
+backend when the runtime guard is available and the applicable conformance
+cases pass. Unsupported features and managed proxy mode still fail closed.
 
 A future implementation may use a structure like:
 
@@ -193,9 +196,13 @@ temp roots are isolated
 protected subpaths remain protected
 ```
 
-`workspace-contained` remains unsupported on macOS by design.
+### macOS phase 4: workspace-contained
 
-### macOS phase 4: network
+`workspace-contained` may be reported supported only after the RFC-0018
+deny-by-default host-read, symlink escape, explicit root, protected metadata,
+runtime root, and network conformance cases pass.
+
+### macOS phase 5: network
 
 Network features should be added after filesystem and runtime isolation are stable.
 
@@ -278,15 +285,20 @@ runtime roots are per execution
 protected subpaths remain protected
 ```
 
-`workspace-contained` remains unsupported on Linux by design.
+### Linux phase 4: workspace-contained
 
-### Linux phase 4: Landlock augmentation
+`workspace-contained` may become supported after the RFC-0018 cases prove a
+deny-by-default mount view, a minimal read-only system baseline, explicit
+policy roots, private runtime roots, protected metadata, symlink containment,
+and fail-closed runtime behavior.
+
+### Linux phase 5: Landlock augmentation
 
 Landlock can augment filesystem policy, but must be gated by runtime ABI detection.
 
 The backend must use only access rights supported by the running kernel's Landlock ABI. Missing or insufficient Landlock support must produce an unsupported or unavailable status, not a weak fallback that claims enforcement.
 
-### Linux phase 5: network
+### Linux phase 6: network
 
 Network support should come after filesystem behavior is stable.
 

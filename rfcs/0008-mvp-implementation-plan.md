@@ -135,7 +135,7 @@ Backend selection:
 
 - Windows: use the Windows sandbox backend for all non-`danger-full-access` executions.
 - macOS: return unsupported for sandboxed execution unless an experimental backend is explicitly built and reports support for the requested capability.
-- Linux: return unsupported for sandboxed execution unless the requested capability has conformance evidence; `read-only` and `workspace-write` with default unmanaged networking are supported when the runtime guard is available.
+- Linux: return unsupported for sandboxed execution unless the requested capability has conformance evidence; `read-only`, `workspace-write`, and the RFC-0018 `workspace-contained` boundary are supported on the experimental/community backend when the runtime guard is available.
 
 ### Phase 3: Windows reference backend
 
@@ -167,7 +167,8 @@ Prepare a macOS backend skeleton and promotion criteria, without making macOS a 
 - Generate Seatbelt profiles from the normalized policy.
 - Pass dynamic roots through safe `-D` parameters or equivalent escaping-safe substitutions.
 - Build path plans with canonical/raw path variants for temp and `/private/var` style roots.
-- Support `read-only` and `workspace-write` semantics.
+- Support `read-only`, `workspace-write`, and the RFC-0018
+  `workspace-contained` semantics.
 - Protect workspace metadata directories by default.
 - For unmanaged networking, leave direct host networking available.
 - For `network.disabled`, omit network permissions.
@@ -238,7 +239,9 @@ Redaction rules:
 MVP should include named built-in profiles:
 
 - `read-only`: broad safe read where platform allows, no writes, network disabled by default.
-- `workspace-contained`: Windows-only strict compliance profile for deployments that require host-read containment.
+- `workspace-contained`: strict host-read containment profile; Windows is the
+  reference implementation and RFC-0018 defines the experimental portable
+  boundary.
 - `workspace-write`: default readable surface, workspace/runtime writable, network proxy by default.
 - `danger-full-access`: local execution, explicit high-risk mode.
 
@@ -282,7 +285,9 @@ Recommended order for agent implementation:
 3. Add backend trait and capability reporting.
 4. Implement Windows backend enough for CI/manual verification on Windows.
 5. Add macOS and Linux backend skeletons that report unsupported capabilities fail-closed.
-6. Support Linux `read-only` and `workspace-write` with default unmanaged networking when runtime probes and conformance tests prove enforcement.
+6. Support Linux `read-only`, `workspace-write`, and the RFC-0018
+   `workspace-contained` boundary when runtime probes and conformance tests
+   prove enforcement.
 7. Add JSONL audit events for all execution paths.
 8. Add JSON-RPC stdio protocol and event subscription.
 9. Add managed proxy guard abstraction and proxy-only tests.

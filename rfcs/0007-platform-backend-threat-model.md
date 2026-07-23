@@ -68,13 +68,13 @@ Sandboxed policies require explicit backend capability for filesystem policy, ru
 | Backend priority | First-class / reference | Experimental contribution track | Experimental contribution track |
 | Execution isolation | Restricted local process | Seatbelt-wrapped process, capability-tested | bubblewrap / namespaces |
 | `read-only` | Supported | Supported | Supported |
-| `workspace-contained` | Strict compliance option | Not planned | Not planned |
+| `workspace-contained` | Strict compliance option | Experimental, conformance-gated | Experimental, conformance-gated |
 | `workspace-write` | Supported | Supported | Supported |
 | `danger-full-access` | Local execution | Local execution | Local execution |
-| Synthetic HOME/profile | Required | Experimental for `read-only` and `workspace-write` | Experimental for `read-only` and `workspace-write` |
-| Protected workspace metadata | Required | Experimental for `workspace-write` | Future |
-| Network `unmanaged` | Supported | Supported for `read-only` and `workspace-write` | Supported for `read-only` and `workspace-write` |
-| Network `disabled` | Supported | Supported for `read-only` and `workspace-write` | Supported for `read-only` and `workspace-write` |
+| Synthetic HOME/profile | Required | Experimental for sandboxed levels | Experimental for sandboxed levels |
+| Protected workspace metadata | Required | Experimental for writable sandboxed levels | Experimental for writable sandboxed levels |
+| Network `unmanaged` | Supported | Supported for portable sandboxed levels | Supported for portable sandboxed levels |
+| Network `disabled` | Supported | Supported for portable sandboxed levels | Supported for portable sandboxed levels |
 | Network `proxy` | Proxy-only egress required | Experimental / promotion target | Future |
 | Domain rules | Not MVP | Not MVP | Future |
 | Fail closed on setup failure | Required | Required | Required |
@@ -146,7 +146,9 @@ Promotion requirements:
 - Enforce `network.proxy` by starting a managed local HTTP proxy, injecting proxy environment variables, and only allowing the sandboxed process to reach that loopback proxy endpoint.
 - Bind proxy lifetime to the command/policy guard; when the command ends or is cancelled, proxy listeners and forwarding tasks must be stopped.
 - Report unsupported or degraded capabilities explicitly instead of treating Seatbelt coverage as equivalent to the Windows reference backend.
-- Keep `workspace-contained` unsupported on macOS; endpoint agent usefulness depends on practical host-side tool and desktop integration.
+- Implement `workspace-contained` as a deny-by-default host-read profile with
+  only the workspace, explicit policy roots, private runtime roots, and the
+  minimum OS execution baseline visible, as amended by RFC-0018.
 
 Known gaps and constraints:
 
@@ -157,7 +159,11 @@ Known gaps and constraints:
 
 ## Linux experimental backend model
 
-Linux is not part of the Windows enterprise security baseline. `read-only` and `workspace-write` are supported with default unmanaged networking when runtime probes and conformance tests prove enforcement on the current host; unsupported sandbox levels and managed network modes still fail closed.
+Linux is not part of the Windows enterprise security baseline. `read-only`,
+`workspace-write`, and `workspace-contained` are supported on the
+experimental/community backend when runtime guards and conformance tests prove
+enforcement on the current host. Unsupported features and managed proxy mode
+still fail closed. RFC-0018 defines the portable contained host-read boundary.
 
 Expected mapping:
 

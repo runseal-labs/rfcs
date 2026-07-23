@@ -10,7 +10,7 @@ Windows reference backend 是企业端 MVP 基线。
 
 > **端侧 AI Agent 的可嵌入安全执行运行时。**
 
-macOS 和 Linux 仍属于同一套跨平台契约，但它们不需要镜像 Windows-only 的 strict compliance 选项。`read-only` 和 `workspace-write` 在 Windows、macOS、Linux 三个平台都 supported，默认网络语义是 unmanaged 直通。`workspace-contained` 是 Windows-only 的 strict compliance 选项，不是 portable parity 目标。任何后端能力只有通过共享 conformance suite，并且对未支持请求 fail-closed，才能升级为更强承诺。
+macOS 和 Linux 继续保持 experimental backend 身份，不进入 Windows 企业安全基线。`read-only`、`workspace-write` 和 `workspace-contained` 复用同一套 portable policy contract；portable `workspace-contained` 使用默认拒绝宿主读取的边界，只有通过共享 conformance suite 后才能升级能力声明。运行时保护不可用时必须 fail-closed。
 
 RunSeal 不定位为 VM 平台、Docker Desktop 替代品或云端多租户沙箱服务。它的目标是把本地 Agent 执行变成一种受策略约束、可审计、可集成的能力。
 
@@ -65,7 +65,7 @@ flowchart LR
 
 - Windows：优先验证受限本地执行身份、文件 ACL、网络阻断和 proxy-only egress，并作为标准的可运行证明。
 - macOS：作为 experimental backend 贡献方向，先验证 `/usr/bin/sandbox-exec` / Seatbelt profile 的本地开发可用性，不进入企业强安全基线。
-- Linux：按 runtime probe 和 conformance evidence 实验性升级单项能力；当前方向先覆盖 `read-only` / `workspace-write` + 默认 unmanaged 网络，其他 sandbox level 仍 fail-closed。
+- Linux：按 runtime probe 和 conformance evidence 实验性升级单项能力；`workspace-contained` 使用最小系统视图和显式 workspace/runtime 挂载，运行时保护不可用时仍 fail-closed。
 
 MVP 的重点是跑通：
 
@@ -96,6 +96,7 @@ MVP 的重点是跑通：
 15. [RFC-0015：Escape definition and adversarial conformance model](rfcs/0015-escape-definition-and-adversarial-conformance.md)
 16. [RFC-0016：Adversarial conformance harness and case format](rfcs/0016-adversarial-conformance-harness-and-case-format.md)
 17. [RFC-0017：Windows workspace-contained boundary amendment](rfcs/0017-windows-workspace-contained-boundary.md)
+18. [RFC-0018：Portable workspace-contained boundary amendment](rfcs/0018-portable-workspace-contained-boundary.md)
 
 ## CLI 词汇
 
@@ -125,6 +126,8 @@ runseal exec --policy workspace-write -- pnpm test
 这些 RFC 基于公开行业信号整理：
 
 - OpenAI Codex：OS-native sandbox、workspace-write 默认语义、网络审批、sandbox 与 approval 分离。
+- Anthropic Sandbox Runtime：面向 Agent 工具和 MCP server 的 macOS/Linux OS-native 进程树隔离。
+- Microsoft MXC：跨平台、策略驱动的执行隔离，以及默认拒绝的 macOS/Linux backend。
 - Linux bubblewrap / Flatpak：基于 namespace 的非特权隔离、默认限制文件系统和网络权限。
 - 企业 egress proxy：默认拒绝出网、边界层凭据注入、按请求审计。
 - OpenTelemetry / structured observability：沙箱执行和网络出口组件的结构化事件实践。

@@ -10,7 +10,7 @@ The Windows reference backend is the complete first-class MVP enterprise baselin
 
 > **Embeddable local security runtime for endpoint AI agents.**
 
-macOS and Linux remain part of the cross-platform contract, but they are not intended to mirror every Windows-only compliance option. `read-only` and `workspace-write` are supported on Windows, macOS, and Linux with default unmanaged networking. `workspace-contained` is a strict Windows-only compliance option, not a portable parity target. A backend capability is promoted only when it passes the shared conformance suite and reports unsupported requests fail-closed.
+macOS and Linux remain experimental backends rather than the Windows enterprise baseline. `read-only`, `workspace-write`, and `workspace-contained` share one portable policy contract; portable `workspace-contained` uses a deny-by-default host-read boundary and is promoted only after the shared conformance suite passes. Unsupported or unavailable runtime guards fail closed.
 
 RunSeal does **not** aim to be a VM platform, a Docker Desktop replacement, or a cloud multi-tenant sandbox service. It turns local agent execution into a policy-governed, auditable capability.
 
@@ -67,6 +67,7 @@ flowchart LR
 15. [RFC-0015: Escape definition and adversarial conformance model](rfcs/0015-escape-definition-and-adversarial-conformance.md)
 16. [RFC-0016: Adversarial conformance harness and case format](rfcs/0016-adversarial-conformance-harness-and-case-format.md)
 17. [RFC-0017: Windows workspace-contained boundary amendment](rfcs/0017-windows-workspace-contained-boundary.md)
+18. [RFC-0018: Portable workspace-contained boundary amendment](rfcs/0018-portable-workspace-contained-boundary.md)
 
 ## CLI vocabulary
 
@@ -95,6 +96,8 @@ The protocol method is `execute`; the returned domain object is an `Execution`, 
 These RFCs intentionally build on public industry signals:
 
 - OpenAI Codex sandboxing: OS-native sandboxing, workspace-write defaults, network approval, and sandbox/approval separation.
+- Anthropic Sandbox Runtime: OS-native process-tree restrictions for agent tools and MCP servers on macOS and Linux.
+- Microsoft MXC: cross-platform policy-driven execution isolation with deny-by-default macOS and Linux backends.
 - Linux bubblewrap/Flatpak: unprivileged namespace-based isolation, default-limited filesystem and network permissions.
 - Enterprise egress proxies such as iron-proxy: default-deny egress, boundary-level secret injection, and per-request structured audit trails.
 - OpenTelemetry/structured observability practices for sandbox execution and egress components.
