@@ -69,6 +69,7 @@ flowchart LR
 17. [RFC-0017: Windows workspace-contained boundary amendment](rfcs/0017-windows-workspace-contained-boundary.md)
 18. [RFC-0018: Portable workspace-contained boundary amendment](rfcs/0018-portable-workspace-contained-boundary.md)
 19. [RFC-0019: macOS managed proxy network boundary amendment](rfcs/0019-macos-managed-proxy-network-boundary.md)
+20. [RFC-0020: Linux managed proxy network boundary amendment](rfcs/0020-linux-managed-proxy-network-boundary.md)
 
 ## CLI vocabulary
 
