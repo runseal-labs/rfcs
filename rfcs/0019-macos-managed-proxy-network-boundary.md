@@ -98,4 +98,3 @@ execution cannot reach unrelated host-local services.
 Environment variables are routing hints for compatible tools, not the
 security boundary. The OS-native deny rule is authoritative when a command
 ignores or replaces those variables.
-
