@@ -291,6 +291,8 @@ RunSeal 的失败诊断不得泄露私有 backend 参数或秘密；不得吞掉
 
 显式修复的公开入口为 `runseal repair execution-gates [--json] [--accept-unverified-release]`，默认只处理当前机器的安全绑定。修复必须在有界互斥量等待内完成，并同时满足：全部被记录的接纳 owner 均已消失（按进程标识与创建时刻核对）；沙箱身份下不存在仍在运行的进程；每条被记录的 runtime root 均已不存在或经标记校验后删除。任一条件不成立时保持绑定与 quarantine 不变并结构化报告 `EXECUTION_CLEANUP_FAILED`，不产生任何副作用。无法检查的进程 token 与未记录 runtime roots 属于未验证证据，默认同样拒绝；只有显式 `--accept-unverified-release` 才可继续，且结构化报告必须逐项标明未验证内容与无法检查的进程数量。修复不得删除存活 owner 的占用，不得释放其他绑定，也不得在无法取得可信状态或协调锁时报告成功。修复是运维动作而不是准入路径：不得放宽任何执行策略，修复结果不得替代清理成功终态。
 
+已知限制：plain 模式下，若 sandboxed 执行的 stdout/stderr 是句柄保持打开但停止读取的 Console，原生 console 写 worker 无法被取消。目标进程范围、runtime roots 与策略占用仍必须释放，但终态可以报告 `EXECUTION_CLEANUP_FAILED`；此时必须保留原始 `requested_termination_reason`（例如 `backpressure`），且该场景不计入 `timeout`/`backpressure` oracle 的通过集。在该限制被显式修订（把 console 转发改为可取消或有界策略，或把宿主前端输出清理与执行范围清理分离）之前，该组合的 conformance 以 `ignored` 记录，不能按通过计入。
+
 清理失败标记持久化失败不能释放 reservation 或恢复绑定接纳。仍存活的宿主必须保留未完成资源的 owner 和跨进程可观察的 fail-closed 约束；实现使用的协调资源应限制访问，不能由受约束的执行清除。宿主死亡后仍按上述未验证记录规则处理，不能把短期协调资源消失解释为清理完成。
 
 标准 `read-only` profile 延续 RFC-0008 的广泛读取语义，禁止工作目录写入；执行私有 runtime root 仍可写。其归一化读取声明必须与实际 backend 行为一致，自定义策略显式提供的读取范围不得被默认 profile 放宽。
