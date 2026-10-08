@@ -99,6 +99,7 @@ MVP 的重点是跑通：
 18. [RFC-0018：Portable workspace-contained boundary amendment](rfcs/0018-portable-workspace-contained-boundary.md)
 19. [RFC-0019：macOS managed proxy network boundary amendment](rfcs/0019-macos-managed-proxy-network-boundary.md)
 20. [RFC-0020：Linux managed proxy network boundary amendment](rfcs/0020-linux-managed-proxy-network-boundary.md)
+21. [RFC-0021：实时 Execution 协议 v2 与透明 runner（已接受）](rfcs/0021-realtime-execution-protocol-v2.md)
 
 ## CLI 词汇
 

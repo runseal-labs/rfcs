@@ -6,6 +6,11 @@
 
 ## Summary
 
+Accepted v2 amendment: [RFC-0021](0021-realtime-execution-protocol-v2.md)
+defines asynchronous admission, interactive methods, cancellation, limits, and
+transparent CLI behavior. It supersedes conflicting provisions for protocol v2;
+this file preserves the historical MVP contract.
+
 RunSeal exposes a stable protocol for policy-governed local execution. The protocol is intentionally higher-level than raw process spawning: clients request an `Execution`, RunSeal prepares a `Seal`, applies policy, streams events, routes network access through controlled proxy when configured, and returns structured results.
 
 The initial transport should be JSON-RPC 2.0 over stdio or a local Unix socket / named pipe. HTTP can be added later without changing method semantics.

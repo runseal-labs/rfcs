@@ -34,6 +34,10 @@ These sources support RunSeal's public positioning: a lightweight OS-native loca
 
 ## Accepted MVP boundaries
 
+[RFC-0021](0021-realtime-execution-protocol-v2.md) proposes a real-time Execution
+v2 amendment, accepted as a separate extension to the historical MVP baseline
+below. Acceptance and implementation conformance are separate gates.
+
 The following boundaries are accepted and implementation-ready:
 
 1. **Product scope**: RunSeal is a local OS-native execution sandbox layer for AI agents, not a hosted sandbox service, Docker replacement, VM platform, or cloud multi-tenant control plane.
