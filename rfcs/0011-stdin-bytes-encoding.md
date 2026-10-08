@@ -4,6 +4,11 @@
 
 ## Summary
 
+Accepted v2 amendment: [RFC-0021](0021-realtime-execution-protocol-v2.md)
+activates stream input and defines PTY/control input while preserving exact
+bytes/file delivery and EOF. It supersedes conflicting provisions for protocol
+v2; this file preserves the historical MVP contract.
+
 RFC-0006 defines `stdin.mode` values but leaves the concrete payload shape for `bytes` underspecified. This RFC fixes the MVP wire format for byte stdin and defines file-backed stdin for larger payloads that should not be embedded in the JSON-RPC request.
 
 ## Decision

@@ -6,6 +6,11 @@
 
 ## Summary
 
+Accepted v2 amendment: [RFC-0021](0021-realtime-execution-protocol-v2.md)
+defines a concurrent stdio lifecycle and bounded service ownership. Its real-time
+requirements supersede the synchronous Phase 1 allowance. RFC-0021 is accepted
+as the v2 design contract; acceptance does not prove implementation capabilities.
+
 RunSeal should evolve from a CLI and stdio JSON-RPC executor into an optional local service runtime. The service owns long-lived runtime state such as sessions, executions, event subscriptions, policy epoch state, managed proxy leases, setup readiness, and audit indexing.
 
 The CLI remains supported. Service mode adds a long-running local control plane for richer integrations without changing the public `Execution`, `SandboxPolicy`, `BackendCapabilities`, `PlatformSandboxPlan`, or `AuditEvent` vocabulary.

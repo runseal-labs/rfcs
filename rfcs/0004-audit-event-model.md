@@ -6,6 +6,11 @@
 
 ## Summary
 
+Accepted v2 amendment: [RFC-0021](0021-realtime-execution-protocol-v2.md)
+defines sequenced live events, terminal results, bounded audit queries, and
+output/input/control retention boundaries. It supersedes conflicting provisions
+for protocol v2; this file preserves the historical MVP contract.
+
 RunSeal emits structured audit events for executions, policy decisions, sandbox backend setup, network proxy activity, resource usage, and denials. Auditability is a core product feature, not an afterthought.
 
 ## Goals
