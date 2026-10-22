@@ -138,3 +138,5 @@ runseal exec --policy workspace-write -- pnpm test
 ## 状态
 
 MVP PRD-ready。当前 RFC 集已经给出 Windows-first 的可实现边界；Windows 是 reference backend 和企业安全基线，macOS / Linux 继续复用同一协议抽象，并通过开源贡献和 conformance evidence 逐步补足。
+
+- [RFC-0022: Control descriptor selection](rfcs/0022-control-descriptor-selection.md) — Draft.
