@@ -115,4 +115,4 @@ The following are intentionally not required before MVP coding begins:
 
 The RFC set is accepted as the Windows-first MVP PRD baseline for implementation. RFC-0013, RFC-0014, RFC-0015, and RFC-0016 are included in the repository planning set as post-MVP/future-direction RFCs and do not block the Windows-first MVP implementation. Future changes should be filed as follow-up RFCs or amendments when they expand scope beyond the accepted MVP boundary, introduce service-mode public behavior, add adversarial conformance requirements, define conformance harness behavior, or promote a non-Windows backend based on conformance evidence.
 
-[RFC-0022](0022-control-descriptor-selection.md) is a draft amendment for explicit control descriptor selection; it does not change backend promotion criteria.
+[RFC-0022](0022-control-descriptor-selection.md) is a draft amendment for explicit control descriptors, native byte pipes, process identity, and terminal delivery observations; it does not change backend promotion criteria.

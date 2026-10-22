@@ -109,4 +109,4 @@ These RFCs intentionally build on public industry signals:
 
 PRD-ready for MVP. The RFC set defines a Windows-first implementation baseline: Windows is the reference backend and enterprise security baseline, while macOS and Linux can be implemented behind the same protocol and promoted through conformance evidence.
 
-- [RFC-0022: Control descriptor selection](rfcs/0022-control-descriptor-selection.md) — Draft.
+- [RFC-0022: Control descriptors and terminal observations](rfcs/0022-control-descriptor-selection.md) — Draft.
